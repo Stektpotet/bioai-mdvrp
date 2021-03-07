@@ -10,18 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-class Util {
-
-    public static float euclideanDistance(Customer a, Customer b) {
-        float x = a.getX() - b.getX();
-        float y = a.getY() - b.getY();
-        x *= x;
-        y *= y;
-        return x + y;
-    }
-
-}
-
 public class Population {
     private Map<Customer, List<Depot>> swappingMap;
     private Map<Depot, List<Customer>> customerAssignment;
