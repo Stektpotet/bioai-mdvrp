@@ -2,13 +2,11 @@ package mdvrp.ga;
 
 import mdvrp.Customer;
 import mdvrp.Depot;
-import mdvrp.MDVRP;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class Population {
     private Map<Customer, List<Depot>> swappingMap;
@@ -85,7 +83,7 @@ public class Population {
             float minimumDistance = Float.MAX_VALUE;
             Depot closestDepot = depots.get(0);
             for (Depot d : depots) {
-                float distance = Util.euclideanDistance(d, c);
+                float distance = Util.euclid(d, c);
                 if (distance < minimumDistance)
                 {
                     minimumDistance = distance;

@@ -4,7 +4,7 @@ import mdvrp.Customer;
 
 public class Util {
 
-    public static float euclideanDistance(Customer a, Customer b) {
+    public static float euclid(Customer a, Customer b) {
         float x = a.getX() - b.getX();
         float y = a.getY() - b.getY();
         x *= x;

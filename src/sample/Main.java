@@ -1,14 +1,9 @@
 package sample;
 
-import com.sun.prism.shader.AlphaOne_Color_Loader;
-import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.collections.ObservableList;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -49,7 +44,7 @@ public class Main extends Application {
 
         Chromosome chromosome = individuals[0];
 
-        Map<Integer, List<Integer>> geneStrings = chromosome.getGeneStrings();
+        Map<Integer, List<Integer>> geneStrings = chromosome.getGenes();
 
         Color[] colors = {Color.GREEN, Color.FIREBRICK, Color.YELLOW, Color.DARKCYAN, Color.AQUA,
                 Color.DARKSALMON, Color.MAROON, Color.PEACHPUFF};
