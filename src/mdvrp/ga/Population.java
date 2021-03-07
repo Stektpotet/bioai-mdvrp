@@ -63,7 +63,7 @@ public class Population {
             }
 
             // 2. Convert to IDs
-            List<List<Integer>> protoChromosome = new ArrayList<>();
+            Map<Integer, List<Integer>> protoChromosome = new HashMap<>();
             for (Map.Entry<Depot, List<Customer>> entry : fullAssignment.entrySet())
             {
 
@@ -71,7 +71,7 @@ public class Population {
                 for (Customer c : entry.getValue())
                     gene.add(c.getId());
 
-                protoChromosome.add(gene);
+                protoChromosome.put(entry.getKey().getId(), gene);
             }
             individuals[i] = new Chromosome(protoChromosome, true);
         }

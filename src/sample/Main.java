@@ -25,10 +25,7 @@ import mdvrp.ga.Chromosome;
 import mdvrp.ga.Population;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Main extends Application {
 
@@ -46,20 +43,20 @@ public class Main extends Application {
 
         primaryStage.setTitle("Multi-Depot Vehicle Routing Problem Visualizer");
 
-        Population pop = new Population(4, problem.getDepots(), problem.getCustomers(), 20000);
+        Population pop = new Population(4, problem.getDepots(), problem.getCustomers(), 2000);
 
         Chromosome[] individuals = pop.getIndividuals();
 
         Chromosome chromosome = individuals[0];
 
-        List<List<Integer>> geneStrings = chromosome.getGeneStrings();
+        Map<Integer, List<Integer>> geneStrings = chromosome.getGeneStrings();
 
         Color[] colors = {Color.GREEN, Color.FIREBRICK, Color.YELLOW, Color.DARKCYAN, Color.AQUA,
                 Color.DARKSALMON, Color.MAROON, Color.PEACHPUFF};
         int i = 0;
         List<Node> nodes = new ArrayList<>();
         List<Customer> customers = problem.getCustomers();
-        for (List<Integer> depotAssignment : geneStrings)
+        for (List<Integer> depotAssignment : geneStrings.values())
         {
             Color color = colors[i++ % colors.length];
             for (Integer customerID : depotAssignment) {

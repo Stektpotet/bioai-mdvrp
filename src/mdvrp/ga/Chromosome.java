@@ -4,21 +4,22 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 // TODO: Naming scheme agreement
 public class Chromosome {
-    private List<List<Integer>> geneStrings;
+    private Map<Integer, List<Integer>> geneStrings;
 
-    public Chromosome(List<List<Integer>> customersPerDepot, boolean shuffle) {
+    public Chromosome(Map<Integer, List<Integer>> customersPerDepot, boolean shuffle) {
         // https://stackoverflow.com/questions/8559092/create-an-array-of-arraylists
         geneStrings = customersPerDepot;
         if (shuffle) {
-            for (List<Integer> depotRoute : customersPerDepot)
+            for (List<Integer> depotRoute : customersPerDepot.values())
                 Collections.shuffle(depotRoute);
         }
     }
 
-    public List<List<Integer>> getGeneStrings() {
+    public Map<Integer, List<Integer>> getGeneStrings() {
         return geneStrings;
     }
 }
