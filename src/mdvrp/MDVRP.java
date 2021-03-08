@@ -1,37 +1,27 @@
 package mdvrp;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*;
 
+/**
+ * Multi-Depot Vehicle Routing Problem
+ */
 public class MDVRP {
-    private List<Customer> vertices;
-    private List<Customer> customers;
-    private List<Depot> depots;
+    private Map<Integer, Customer> customers;
+    private Map<Integer, Depot> depots;
 
     private int numMaxVehicles = 0;
-    private int numCustomers = 0;
 
     MDVRP(int numMaxVehicles, int numCustomers, int numDepots) {
-        vertices = new ArrayList<Customer>(numCustomers + numDepots);
-        customers = Stream.generate(Customer::new).limit(numCustomers).collect(Collectors.toList());
-        depots = Stream.generate(Depot::new).limit(numDepots).collect(Collectors.toList());
-
-        // Nice way to get vertices to reference the same objects stored in the customer and depot lists
-        vertices.addAll(customers);
-        vertices.addAll(depots);
-
         this.numMaxVehicles = numMaxVehicles;
-        this.numCustomers = numCustomers;
+        customers = new HashMap<>(numCustomers);
+        depots = new HashMap<>(numDepots);
     }
 
-    List<Depot> getDepotsMutable() {
+    Map<Integer, Depot> getDepotsMutable() {
         return depots;
     }
-    public List<Depot> getDepots() {
-        return Collections.unmodifiableList(depots);
+    public Map<Integer, Depot> getDepots() {
+        return Collections.unmodifiableMap(depots);
     }
 
     public int getNumMaxVehicles() {
@@ -39,21 +29,18 @@ public class MDVRP {
     }
 
     public int getNumCustomers() {
-        return numCustomers;
+        return customers.size();
     }
     public int getNumDepots() { return depots.size(); }
 
     void setNumMaxVehicles(int numMaxVehicles) {
         this.numMaxVehicles = numMaxVehicles;
     }
-    void setNumCustomers(int numCustomers) {
-        this.numCustomers = numCustomers;
-    }
 
-    List<Customer> getVerticesMutable() {
-        return vertices;
+    Map<Integer, Customer>  getCustomersMutable() {
+        return customers;
     }
-    public List<Customer> getCustomers() {
-        return Collections.unmodifiableList(customers);
+    public Map<Integer, Customer> getCustomers() {
+        return Collections.unmodifiableMap(customers);
     }
 }

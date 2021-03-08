@@ -14,12 +14,12 @@ public class Population {
 
     private Chromosome[] individuals;
 
-    public Population(int size, List<Depot> depots, List<Customer> customers, float swappingDistance) {
+    public Population(int size, Map<Integer, Depot> depots, Map<Integer, Customer> customers, float swappingDistance) {
         customerAssignment = new HashMap<>(depots.size());
         swappingMap = new HashMap<>();
         individuals = new Chromosome[size];
 
-        for (Depot d : depots)
+        for (Depot d : depots.values())
             customerAssignment.put(d, new ArrayList<>());
 
         evaluateDistances(depots, customers, swappingDistance);
@@ -46,6 +46,7 @@ public class Population {
         return copy;
     }
 
+
     private void actuallyMakeTheChromosomes() {
         for (int i = 0; i < getSize(); i++) {
             // TODO: Potentially optimizable if the swappableMap is empty
@@ -53,17 +54,18 @@ public class Population {
             Map<Depot, List<Customer>> fullAssignment = copyAssignment();
 
             // 1. Move from swappingmap into full assignment
-            for (Map.Entry<Customer, List<Depot>> entry : swappingMap.entrySet())
-            {
+            for (Map.Entry<Customer, List<Depot>> entry : swappingMap.entrySet()) {
                 List<Depot> swapOptions = entry.getValue();
                 Depot selectedDepot = swapOptions.get(GeneticAlgorithm.rand.nextInt(swapOptions.size()));
                 fullAssignment.get(selectedDepot).add(entry.getKey());
             }
 
-            // 2. Convert to IDs
+            // 2. Check Capacity feasibility of depot customer assignments
+//            isAssignmentCapacityValid(fullAssignment, )
+
+            // 3. Convert to IDs
             Map<Integer, List<Integer>> protoChromosome = new HashMap<>();
-            for (Map.Entry<Depot, List<Customer>> entry : fullAssignment.entrySet())
-            {
+            for (Map.Entry<Depot, List<Customer>> entry : fullAssignment.entrySet()) {
 
                 List<Integer> gene = new ArrayList<>();
                 for (Customer c : entry.getValue())
@@ -75,14 +77,25 @@ public class Population {
         }
     }
 
-    private void evaluateDistances(List<Depot> depots, List<Customer> customers, float swappingDistance) { // -> List<Chromosome>
+    private static boolean isAssignmentCapacityValid(Map<Depot, List<Customer>> assignment, int numVehicles) {
+        int i = 0;
+        for (var gene : assignment.entrySet()) {
+            int depotRoutesSum = gene.getValue().stream().mapToInt(Customer::getDemand).sum();
+            int depotCapacity = gene.getKey().getMaxVehicleLoad() * numVehicles;
+            if (depotRoutesSum > depotCapacity)
+                return false;
+        }
+        return true;
+    }
 
-        for (Customer c : customers)
+    private void evaluateDistances(Map<Integer, Depot> depots, Map<Integer, Customer> customers, float swappingDistance) { // -> List<Chromosome>
+
+        for (Customer c : customers.values())
         {
             Map<Depot, Float> distanceMap = new HashMap<>(depots.size());
             float minimumDistance = Float.MAX_VALUE;
             Depot closestDepot = depots.get(0);
-            for (Depot d : depots) {
+            for (Depot d : depots.values()) {
                 float distance = Util.euclid(d, c);
                 if (distance < minimumDistance)
                 {
@@ -94,7 +107,7 @@ public class Population {
 
             List<Depot> depotsInSwappingDistance = new ArrayList<>();
 
-            for (Depot d1 : depots) {
+            for (Depot d1 : depots.values()) {
                 if (closestDepot == d1)
                     continue;
                 float comparison = distanceMap.get(d1) - minimumDistance;

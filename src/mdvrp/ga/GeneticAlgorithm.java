@@ -8,7 +8,7 @@ import java.util.*;
 
 public class GeneticAlgorithm {
 
-    public static Random rand = new Random();
+    public static Random rand = new Random(69);
     private MDVRP problem;
     private float swappingDistance;
 

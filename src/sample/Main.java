@@ -18,9 +18,11 @@ import mdvrp.MDVRP;
 import mdvrp.MDVRPFiles;
 import mdvrp.ga.Chromosome;
 import mdvrp.ga.Population;
+import mdvrp.ga.RouteScheduler;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main extends Application {
 
@@ -29,7 +31,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        MDVRP problem = MDVRPFiles.ReadFile("res/problems/p21");
+        MDVRP problem = MDVRPFiles.ReadFile("res/problems/p04");
         if (problem == null)
             return;
 
@@ -38,11 +40,14 @@ public class Main extends Application {
 
         primaryStage.setTitle("Multi-Depot Vehicle Routing Problem Visualizer");
 
-        Population pop = new Population(4, problem.getDepots(), problem.getCustomers(), 2000);
+        Population pop = new Population(100, problem.getDepots(), problem.getCustomers(), 0);
 
         Chromosome[] individuals = pop.getIndividuals();
 
-        Chromosome chromosome = individuals[0];
+        Chromosome chromosome = individuals[1];
+        List<Map<Integer, List<List<Integer>>>> scheduledRoutesPerDepot = Arrays.stream(individuals).map(
+                c -> RouteScheduler.scheduleRoutes(c, problem)
+        ).collect(Collectors.toList());
 
         Map<Integer, List<Integer>> geneStrings = chromosome.getGenes();
 
@@ -50,12 +55,12 @@ public class Main extends Application {
                 Color.DARKSALMON, Color.MAROON, Color.PEACHPUFF};
         int i = 0;
         List<Node> nodes = new ArrayList<>();
-        List<Customer> customers = problem.getCustomers();
+        Map<Integer, Customer> customers = problem.getCustomers();
         for (List<Integer> depotAssignment : geneStrings.values())
         {
             Color color = colors[i++ % colors.length];
             for (Integer customerID : depotAssignment) {
-                Customer c = customers.get(customerID - 1);
+                Customer c = customers.get(customerID);
                 Circle node = new Circle(c.getX(), c.getY(),1, color);
                 nodes.add(node);
             }
@@ -65,7 +70,7 @@ public class Main extends Application {
 //            nodes.add(node);
 //            System.out.println(c);
 //        }
-        for (Depot d : problem.getDepots()) {
+        for (Depot d : problem.getDepots().values()) {
             Rectangle node = new Rectangle(d.getX(), d.getY(),3, 3);
             node.setFill(DEPOT_COLOR);
             nodes.add(node);

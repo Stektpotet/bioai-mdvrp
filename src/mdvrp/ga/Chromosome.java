@@ -6,6 +6,7 @@ import java.util.Map;
 
 // TODO: Naming scheme agreement
 public class Chromosome {
+    private boolean feasible = true;
     private Map<Integer, List<Integer>> genes;
 
     public Chromosome(Map<Integer, List<Integer>> customersPerDepot, boolean shuffle) {
@@ -18,6 +19,14 @@ public class Chromosome {
     }
 
     public Map<Integer, List<Integer>> getGenes() {
-        return genes;
+        return Collections.unmodifiableMap(genes);
+    }
+
+    public void setFeasible(boolean feasible) {
+        this.feasible = feasible;
+    }
+
+    public boolean getFeasible() {
+        return feasible;
     }
 }
