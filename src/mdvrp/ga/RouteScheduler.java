@@ -24,7 +24,7 @@ public class RouteScheduler {
             int maxVehicleLoad = depot.getMaxVehicleLoad();
             int numMaxVehicles = problem.getNumMaxVehicles();
 
-            // TODO: Use stream mappings
+            // TODO: Use stream mappings BEWARE STREAMS ARE CONSUMED!
             // gene.getValue().stream().map(customers::get)
 
             List<List<Integer>> schedule = trivialPhase(gene.getValue(), customers, maxVehicleLoad, numMaxVehicles);
@@ -40,7 +40,7 @@ public class RouteScheduler {
 
 
     private static boolean geneFeasibility(Stream<Stream<Customer>> routes, int maxVehicleLoad) {
-        return routes.allMatch(routeStream -> maxVehicleLoad < routeStream.mapToInt(Customer::getDemand).sum());
+        return routes.allMatch(routeStream -> maxVehicleLoad >= routeStream.mapToInt(Customer::getDemand).sum());
     }
 
     /**
@@ -139,13 +139,9 @@ public class RouteScheduler {
             }
             schedule.add(route);
         }
-        System.out.println(String.format("b: %d, g: %d", currentBase, geneString.size()));
 
         if (currentBase < geneString.size()) {
-            System.out.println(
-                    String.format("Chromosome cannot be validly scheduled!\nNeeded %d bases covered, only managed %d",
-                            geneString.size(), currentBase)
-            );
+//
             var route = schedule.get(schedule.size() - 1);
             for (; currentBase < geneString.size(); currentBase++) {
                 Integer customerID = geneString.get(currentBase);

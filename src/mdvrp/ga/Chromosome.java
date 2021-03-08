@@ -13,8 +13,7 @@ public class Chromosome {
         // https://stackoverflow.com/questions/8559092/create-an-array-of-arraylists
         genes = customersPerDepot;
         if (shuffle) {
-            for (List<Integer> depotRoute : customersPerDepot.values())
-                Collections.shuffle(depotRoute);
+            customersPerDepot.values().forEach(Collections::shuffle);
         }
     }
 

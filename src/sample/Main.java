@@ -21,6 +21,7 @@ import mdvrp.ga.Population;
 import mdvrp.ga.RouteScheduler;
 
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,14 +41,16 @@ public class Main extends Application {
 
         primaryStage.setTitle("Multi-Depot Vehicle Routing Problem Visualizer");
 
-        Population pop = new Population(100, problem.getDepots(), problem.getCustomers(), 0);
+        Population pop = new Population(10000, problem.getDepots(), problem.getCustomers(), 800);
 
         Chromosome[] individuals = pop.getIndividuals();
 
-        Chromosome chromosome = individuals[1];
+        Chromosome chromosome = individuals[0];
         List<Map<Integer, List<List<Integer>>>> scheduledRoutesPerDepot = Arrays.stream(individuals).map(
                 c -> RouteScheduler.scheduleRoutes(c, problem)
         ).collect(Collectors.toList());
+
+        System.out.println(Arrays.stream(individuals).mapToInt(c -> c.getFeasible() ? 1 : 0).sum());
 
         Map<Integer, List<Integer>> geneStrings = chromosome.getGenes();
 
