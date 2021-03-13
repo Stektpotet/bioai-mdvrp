@@ -1,11 +1,8 @@
 package mdvrp;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class MDVRPFiles {
     public static MDVRP ReadFile(String filepath) {
