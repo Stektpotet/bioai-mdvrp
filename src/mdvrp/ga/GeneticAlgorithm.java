@@ -1,5 +1,11 @@
 package mdvrp.ga;
 
+import ga.FitnessCalculator;
+import ga.change.Mutator;
+import ga.change.Recombinator;
+import ga.data.Initializer;
+import ga.selection.ParentSelector;
+import ga.selection.SurvivorSelector;
 import mdvrp.Customer;
 import mdvrp.MDVRP;
 
@@ -11,44 +17,31 @@ public class GeneticAlgorithm {
     private MDVRP problem;
     private float swappingDistance;
     private float unfeasibilityFee;
-    // MutationFunctor
-    // ParentSelectionFunctor
-    // SurvivorSelectionFunctor
-    // CrossoverFunctor
+
+    private Initializer<Chromosome> initializer;
+    private Recombinator<Chromosome> recombinator;
+    private Mutator<Chromosome> mutator;
+    private ParentSelector<Chromosome> parentSelector;
+    private SurvivorSelector<Chromosome> survivorSelector;
+    private FitnessCalculator<Chromosome> fitnessCalculator;
 
 
-    public GeneticAlgorithm(MDVRP problem, float swappingDistance, float unfeasibilityFee) {
+    public GeneticAlgorithm(Initializer<Chromosome> initializer,
+                            Recombinator<Chromosome> recombinator,
+                            Mutator<Chromosome> mutator,
+                            ParentSelector<Chromosome> parentSelector,
+                            SurvivorSelector<Chromosome> survivorSelector,
+                            FitnessCalculator<Chromosome> fitnessCalculator,
+                            float swappingDistance, float unfeasibilityFee, MDVRP problem) {
+
+        this.initializer = initializer;
+        this.recombinator = recombinator;
+        this.mutator = mutator;
+        this.parentSelector = parentSelector;
+        this.survivorSelector = survivorSelector;
+        this.fitnessCalculator = fitnessCalculator;
         this.problem = problem;
         this.swappingDistance = swappingDistance;
         this.unfeasibilityFee = unfeasibilityFee;
-    }
-
-    private Map<Integer, List<List<Integer>>> schedule(Chromosome chromosome)  {
-        return RouteScheduler.scheduleRoutes(chromosome, problem);
-    }
-
-    private float fitness(Chromosome chromosome) {
-        Map<Integer, List<List<Integer>>> schedule = schedule(chromosome);
-        float fitness = 0;
-
-        // loop over depots - routes - customers and add distance
-        for (var routesPerDepot : schedule.entrySet()) {
-            Customer depot = problem.getDepots().get(routesPerDepot.getKey());
-            for (List<Integer> route : routesPerDepot.getValue()) {
-                Customer position = depot; // start route add depo
-                for (Customer base : route.stream().map(problem.getCustomers()::get).collect(Collectors.toList())) {
-                    fitness += Util.euclid(position, base);
-                    position = base;
-                }
-                fitness += Util.euclid(position, depot); // end route at depot
-            }
-        }
-
-        // add feasibility fee
-        // TODO: think about "you get what you ask for" - feasibility is more complex than just the flag we have now.
-        if (!chromosome.getFeasible()) {
-            fitness += unfeasibilityFee;
-        }
-        return fitness;
     }
 }

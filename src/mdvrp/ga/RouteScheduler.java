@@ -35,7 +35,7 @@ public class RouteScheduler {
             routesPerDepot.put(depot.getId(), schedule);
         }
         chromosome.setFeasible(feasible);
-        return routesPerDepot;
+        return Collections.unmodifiableMap(routesPerDepot);
     }
 
 
