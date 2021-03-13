@@ -8,10 +8,14 @@ import java.util.stream.Collectors;
 
 public class GeneticAlgorithm {
 
-    public static Random rand = new Random(69);
     private MDVRP problem;
     private float swappingDistance;
     private float unfeasibilityFee;
+    // MutationFunctor
+    // ParentSelectionFunctor
+    // SurvivorSelectionFunctor
+    // CrossoverFunctor
+
 
     public GeneticAlgorithm(MDVRP problem, float swappingDistance, float unfeasibilityFee) {
         this.problem = problem;
@@ -45,9 +49,6 @@ public class GeneticAlgorithm {
         if (!chromosome.getFeasible()) {
             fitness += unfeasibilityFee;
         }
-
         return fitness;
     }
-
-
 }
