@@ -1,5 +1,5 @@
 package ga.data;
 
-public interface Initializer<C> {
-    public Population<C> breed(int popSize);
+public interface Initializer<Pop extends Population<C>, C> {
+    public Pop breed(int popSize);
 }

@@ -1,7 +1,5 @@
 package sample;
 
-import ga.data.Initializer;
-import ga.data.Population;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -19,7 +17,7 @@ public class Main extends Application {
     static final int SCREEN_WIDTH = 896, SCREEN_HEIGHT = 896;
 
     MDVRPVisualizer visualizer;
-    mdvrp.ga.Population population;
+    PopulationMDVRP population;
     MDVRP problem;
     ShuffleCustomerOrderMutation shuffler;
     // BASED ON THIS
@@ -37,7 +35,12 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        launch(args);
+//        launch(args);
+        var problem = MDVRPFiles.ReadFile("res/problems/p21");
+        GeneticAlgorithm<Chromosome> ga = new GeneticAlgorithm<Chromosome>(
+                new Breeder(problem, 0),
+                null,null,null,null,null, problem
+        );
     }
 
     @Override
@@ -68,7 +71,9 @@ public class Main extends Application {
         if (problem == null)
             return false;
         Breeder breeder = new Breeder(problem, 0);
-        population = breeder.breed(5);
+
+
+
         return true;
     }
 
