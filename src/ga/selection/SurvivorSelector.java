@@ -1,7 +1,10 @@
 package ga.selection;
 
+import ga.data.Chromosome;
 import ga.data.Population;
 
-public interface SurvivorSelector<Pop extends Population<C>, C> {
-    public Pop select(Pop generation, C[] parents, C[] offspring);
+import java.util.List;
+
+public interface SurvivorSelector<Pop extends Population<C>, C extends Chromosome> {
+    public Pop select(Pop generation, List<C> parents, List<C> offspring);
 }
