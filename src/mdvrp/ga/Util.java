@@ -4,9 +4,7 @@ import ga.data.Chromosome;
 import mdvrp.Customer;
 import mdvrp.Depot;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class Util {
     public static Random random = new Random(69);
@@ -30,6 +28,28 @@ public class Util {
             }
         }
         return fittest;
+    }
+
+    public static Map<Integer, List<List<Integer>>> deepCopySchedule(Map<Integer, List<List<Integer>>> original) {
+        Map<Integer, List<List<Integer>>> copy = new HashMap<>();
+
+        for (Map.Entry<Integer, List<List<Integer>>> depotSchedule : original.entrySet()) {
+
+            // get depot Id
+            Integer depotId = depotSchedule.getKey();
+
+            // copy routes
+            List<List<Integer>> routesOriginal = depotSchedule.getValue();
+            List<List<Integer>> routesCopy = new ArrayList<>(routesOriginal.size());
+            for (List<Integer> singleRouteOriginal : routesOriginal) {
+                routesCopy.add(new ArrayList<>(singleRouteOriginal));
+            }
+
+            // insert into copied schedule
+            copy.put(depotId, routesCopy);
+        }
+
+        return copy;
     }
 
     private static boolean isAssignmentCapacityValid(Map<Depot, List<Customer>> assignment, int numVehicles) {
