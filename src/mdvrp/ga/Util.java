@@ -1,5 +1,6 @@
 package mdvrp.ga;
 
+import ga.data.Chromosome;
 import mdvrp.Customer;
 import mdvrp.Depot;
 
@@ -17,6 +18,19 @@ public class Util {
         return x + y;
     }
 
+
+    public static <C extends Chromosome> C ArgMin(List<C> arr) {
+        float minFitness = arr.get(0).fitness();
+        C fittest = arr.get(0);
+        for (C c : arr){
+            float currentFitness = c.fitness();
+            if (currentFitness < minFitness) {
+                minFitness = currentFitness;
+                fittest = c;
+            }
+        }
+        return fittest;
+    }
 
     private static boolean isAssignmentCapacityValid(Map<Depot, List<Customer>> assignment, int numVehicles) {
         int i = 0;
