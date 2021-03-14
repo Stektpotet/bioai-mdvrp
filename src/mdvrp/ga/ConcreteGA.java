@@ -1,6 +1,7 @@
 package mdvrp.ga;
 
 import mdvrp.MDVRP;
+import java.util.List;
 
 public class ConcreteGA {
 
@@ -33,11 +34,11 @@ public class ConcreteGA {
         this.problem = problem;
     }
 
-    public Chromosome run(int populationSize, int numGenerations) {
+    public ChromosomeMDVRP run(int populationSize, int numGenerations) {
         PopulationMDVRP pop = initializer.breed(populationSize);
         for (int i = 0; i < numGenerations; i++) {
-            Chromosome[] parents = parentSelector.select(pop);
-            Chromosome[] offspring = recombinator.recombine(parents);
+            List<ChromosomeMDVRP> parents = parentSelector.select(pop);
+            List<ChromosomeMDVRP> offspring = recombinator.recombine(parents);
             pop = survivorSelector.select(pop, parents, offspring);
         }
         return null;

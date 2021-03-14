@@ -2,12 +2,15 @@ package mdvrp.ga;
 
 import ga.change.Mutator;
 import ga.change.Recombinator;
+import ga.data.Chromosome;
 import ga.data.Initializer;
 import ga.data.Population;
 import ga.selection.ParentSelector;
 import ga.selection.SurvivorSelector;
 
-public class GeneticAlgorithm<C> {
+import java.util.List;
+
+public class GeneticAlgorithm<C extends Chromosome> {
 
     private Initializer<Population<C>, C> initializer;
     private Recombinator<C> recombinator;
@@ -32,9 +35,10 @@ public class GeneticAlgorithm<C> {
     public C run(int populationSize, int numGenerations) {
         Population<C> pop = initializer.breed(populationSize);
         for (int i = 0; i < numGenerations; i++) {
-            C[] parents = parentSelector.select(pop);
-            C[] offspring = mutator.mutateAll(recombinator.recombine(parents));
+            List<C> parents = parentSelector.select(pop);
+            List<C> offspring = mutator.mutateAll(recombinator.recombine(parents));
             pop = survivorSelector.select(pop, parents, offspring);
+            Chromosome currentOptimum = pop.getOptimum();
         }
         return null;
     }

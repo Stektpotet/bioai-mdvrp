@@ -8,7 +8,7 @@ import mdvrp.MDVRP;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Breeder implements Initializer<PopulationMDVRP, Chromosome> {
+public class Breeder implements Initializer<PopulationMDVRP, ChromosomeMDVRP> {
 
     private MDVRP problem;
     private float swappingDistance;
@@ -113,7 +113,7 @@ public class Breeder implements Initializer<PopulationMDVRP, Chromosome> {
 
 
     private PopulationMDVRP actuallyMakeTheChromosomes(int popSize) {
-        Chromosome[] individuals = new Chromosome[popSize];
+        ChromosomeMDVRP[] individuals = new ChromosomeMDVRP[popSize];
         for (int i = 0; i < popSize; i++) {
             // TODO: Potentially optimizable if the swappableMap is empty
             //       Just convert the customerAssignment to ids
@@ -136,7 +136,7 @@ public class Breeder implements Initializer<PopulationMDVRP, Chromosome> {
                 List<Integer> geneString = new ArrayList<>(entry.getValue());
                 protoChromosome.put(entry.getKey(), geneString);
             }
-            individuals[i] = new Chromosome(protoChromosome, true);
+            individuals[i] = new ChromosomeMDVRP(protoChromosome, true);
         }
         return new PopulationMDVRP(individuals, swappingMap);
     }

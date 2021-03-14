@@ -1,22 +1,27 @@
 package mdvrp.ga;
 
+import ga.data.Chromosome;
 import mdvrp.Customer;
 import mdvrp.MDVRP;
+import mdvrp.MDVRPFiles;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-// TODO: Naming scheme agreement
-public class Chromosome {
+public class ChromosomeMDVRP implements Chromosome {
+    // TODO: PLEASE GOD NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+
+    public static final MDVRP PROBLEM = MDVRPFiles.ReadFile("res/problems/p01");
+
     private boolean feasible = true;
     private Map<Integer, List<Integer>> genes;
     private boolean scheduled = false;
     private Map<Integer, List<List<Integer>>> schedule;
     private static final float UNFEASABILITY_FEE = 1000;
 
-    Chromosome(Map<Integer, List<Integer>> customersPerDepot, boolean shuffle) {
+    ChromosomeMDVRP(Map<Integer, List<Integer>> customersPerDepot, boolean shuffle) {
         // https://stackoverflow.com/questions/8559092/create-an-array-of-arraylists
         genes = customersPerDepot;
         if (shuffle) {
@@ -45,7 +50,12 @@ public class Chromosome {
         return Collections.unmodifiableMap(schedule);
     }
 
+    public float fitness() {
+        return fitness(PROBLEM);
+    }
+
     private float fitness(MDVRP problem) {
+
         getSchedule(problem);
 
         float fitness = 0;

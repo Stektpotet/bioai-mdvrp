@@ -1,22 +1,20 @@
 package mdvrp.ga;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class PopulationMDVRP extends ga.data.Population<Chromosome> {
+public class PopulationMDVRP extends ga.data.Population<ChromosomeMDVRP> {
     private Map<Integer, List<Integer>> swappingMap;
 
-    PopulationMDVRP(Chromosome[] individuals, Map<Integer, List<Integer>> swappingMap) {
-        this.individuals = individuals;
+    PopulationMDVRP(ChromosomeMDVRP[] individuals, Map<Integer, List<Integer>> swappingMap) {
+        this.individuals = Arrays.asList(individuals);
         this.swappingMap = swappingMap;
     }
 
-    public Chromosome[] getIndividuals() {
-        return individuals;
-    }
-
     int getSize() {
-        return individuals.length;
+        return individuals.size();
     }
 
     Map<Integer, List<Integer>> getSwappingMap() {

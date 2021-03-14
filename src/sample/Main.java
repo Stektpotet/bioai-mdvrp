@@ -37,10 +37,7 @@ public class Main extends Application {
     public static void main(String[] args) {
 //        launch(args);
         var problem = MDVRPFiles.ReadFile("res/problems/p21");
-        GeneticAlgorithm<Chromosome> ga = new GeneticAlgorithm<Chromosome>(
-                new Breeder(problem, 0),
-                null,null,null,null,null, problem
-        );
+
     }
 
     @Override
@@ -70,20 +67,11 @@ public class Main extends Application {
         problem = MDVRPFiles.ReadFile("res/problems/p21");
         if (problem == null)
             return false;
-        Breeder breeder = new Breeder(problem, 0);
-
-
-
         return true;
     }
 
     private void updateAndRender(float delta) {
         // TODO: get fittest individual
-        population.getIndividuals()[0] = shuffler.mutate(population.getIndividuals()[0]);
-        var start = System.nanoTime();
-        var schedule = RouteScheduler.scheduleRoutes(population.getIndividuals()[0], problem);
-
-        System.out.println("Scheduling took " + (System.nanoTime() - start) + "ns");
         visualizer.drawAll(problem, schedule);
     }
 }

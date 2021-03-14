@@ -5,14 +5,13 @@ import mdvrp.Depot;
 import mdvrp.MDVRP;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
 // Chromosome Decoder
 public class RouteScheduler {
 
-    public static Map<Integer, List<List<Integer>>>  scheduleRoutes(Chromosome chromosome, MDVRP problem) {
+    public static Map<Integer, List<List<Integer>>>  scheduleRoutes(ChromosomeMDVRP chromosome, MDVRP problem) {
         Map<Integer, List<List<Integer>>> routesPerDepot = new HashMap<>();
 
         boolean feasible = true;
