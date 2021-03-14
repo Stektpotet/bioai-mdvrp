@@ -1,6 +1,9 @@
 package ga.selection;
+import ga.data.Chromosome;
 import ga.data.Population;
 
-public interface ParentSelector<C> {
-    public C[] select(Population<C> population);
+import java.util.List;
+
+public interface ParentSelector<C extends Chromosome> {
+    public List<C> select(Population<C> population);
 }
