@@ -39,7 +39,7 @@ public class ConcreteGA {
         for (int i = 0; i < numGenerations; i++) {
             List<ChromosomeMDVRP> parents = parentSelector.select(pop);
             List<ChromosomeMDVRP> offspring = recombinator.recombine(parents);
-            pop = survivorSelector.select(pop, parents, offspring);
+            pop = survivorSelector.select(pop, parents, offspring);p
         }
         return null;
     }
