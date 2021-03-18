@@ -37,6 +37,18 @@ public class RouteScheduler {
         return Collections.unmodifiableMap(routesPerDepot);
     }
 
+    public static int routeSum(List<Integer> route, Map<Integer, Customer> customers) {
+        return route.stream().map(customers::get).mapToInt(Customer::getDemand).sum();
+    }
+
+
+    public static int depotScheduleSum(List<List<Integer>> depotSchedule, Map<Integer, Customer> customers) {
+        return depotSchedule.stream().map(customers::get).mapToInt(Customer::getDemand).sum();
+    }
+
+    public static boolean geneFeasibilitz(List<List<Integer>> schedule, Map<Integer, Customer> customers, int maxVehicleLoad) {
+        return geneFeasibility(schedule.stream().map(route -> route.stream().map(customers::get)), maxVehicleLoad);
+    }
 
     private static boolean geneFeasibility(Stream<Stream<Customer>> routes, int maxVehicleLoad) {
         return routes.allMatch(routeStream -> maxVehicleLoad >= routeStream.mapToInt(Customer::getDemand).sum());

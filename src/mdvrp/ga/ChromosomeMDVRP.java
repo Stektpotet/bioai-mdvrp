@@ -5,9 +5,7 @@ import mdvrp.Customer;
 import mdvrp.MDVRP;
 import mdvrp.MDVRPFiles;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ChromosomeMDVRP implements Chromosome {
@@ -27,6 +25,17 @@ public class ChromosomeMDVRP implements Chromosome {
         if (shuffle) {
             customersPerDepot.values().forEach(Collections::shuffle);
         }
+    }
+
+    ChromosomeMDVRP(Map<Integer, List<List<Integer>>> schedule) {
+        genes = new HashMap<>(schedule.size());
+        for (Map.Entry<Integer, List<List<Integer>>> entry: schedule.entrySet()) {
+            Integer depotId = entry.getKey();
+            List<Integer> geneString = entry.getValue().stream().flatMap(List::stream).collect(Collectors.toList());
+            genes.put(depotId, geneString);
+        }
+        scheduled = false;
+
     }
 
     Map<Integer, List<Integer>> getGenes() {
