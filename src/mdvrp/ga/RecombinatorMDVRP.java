@@ -42,23 +42,50 @@ public class RecombinatorMDVRP implements Recombinator<ChromosomeMDVRP> {
         // make new Chromosomes
         Map<Integer, List<List<Integer>>> daughterSchedule = Util.deepCopySchedule(mSchedule);
         daughterSchedule.put(depotId, dauDepotRoutes);
-        //TODO next: append lists in schedule to get Chromosome
-        ChromosomeMDVRP daughter = new ChromosomeMDVRP(daughterSchedule, false);
+        ChromosomeMDVRP daughter = new ChromosomeMDVRP(daughterSchedule);
 
-        Map<Integer, List<List<Integer>>> son = Util.deepCopySchedule(dSchedule);
-        son.put(depotId, sonDepotRoutes);
+        Map<Integer, List<List<Integer>>> sonSchedule = Util.deepCopySchedule(dSchedule);
+        sonSchedule.put(depotId, sonDepotRoutes);
+        ChromosomeMDVRP son = new ChromosomeMDVRP(sonSchedule);
 
 
         List<ChromosomeMDVRP> offspring = new ArrayList<>();
         offspring.add(son);
         offspring.add(daughter);
-        return new ArrayList() ;
+        return offspring;
 
 
 
     }
 
     private List<List<Integer>> reinsert(List<List<Integer>> depotSchedule, List<Integer> toReinsert) {
+        for (var customerId : toReinsert) {
+            if (!depotSchedule.remove(customerId)) {
+                continue;
+            }
 
+            for (var route : depotSchedule) {
+                for (int i = 0; i < route.size() + 1; i++) {
+                    RouteScheduler.geneFeasibilitz(depotSchedule)
+                    //          if feasible
+                    //              compute insertion cost
+                    //              store in feasibleLocations
+
+                }
+            }
+        }
+
+        // for each customer in to Reinsert:
+        //      take customer out of depotSchedule
+
+        //      for each locations in depotSchedule:
+        //      if feasibleLocations is empty:
+        //          TODO tbd
+        //      if random r < 0.8
+        //          choose best location in feasibleLocations
+        //      else
+        //          choose random feasibleLocations
+
+        return null;
     }
 }
