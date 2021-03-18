@@ -72,6 +72,6 @@ public class Main extends Application {
 
     private void updateAndRender(float delta) {
         // TODO: get fittest individual
-        visualizer.drawAll(problem, schedule);
+//        visualizer.drawAll(problem, schedule);
     }
 }

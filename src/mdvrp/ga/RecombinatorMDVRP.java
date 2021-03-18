@@ -66,7 +66,7 @@ public class RecombinatorMDVRP implements Recombinator<ChromosomeMDVRP> {
 
             for (var route : depotSchedule) {
                 for (int i = 0; i < route.size() + 1; i++) {
-                    RouteScheduler.geneFeasibilitz(depotSchedule)
+//                    RouteScheduler.geneFeasibilitz(depotSchedule)
                     //          if feasible
                     //              compute insertion cost
                     //              store in feasibleLocations
