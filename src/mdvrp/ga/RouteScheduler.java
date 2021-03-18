@@ -3,6 +3,8 @@ package mdvrp.ga;
 import mdvrp.Customer;
 import mdvrp.Depot;
 import mdvrp.MDVRP;
+import mdvrp.collections.CustomerSequence;
+import mdvrp.collections.Schedule;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -11,13 +13,13 @@ import java.util.stream.Stream;
 // Chromosome Decoder
 public class RouteScheduler {
 
-    public static Map<Integer, List<List<Integer>>>  scheduleRoutes(ChromosomeMDVRP chromosome, MDVRP problem) {
-        Map<Integer, List<List<Integer>>> routesPerDepot = new HashMap<>();
+    public static Map<Integer, Schedule>  scheduleRoutes(ChromosomeMDVRP chromosome, MDVRP problem) {
+        Map<Integer, Schedule> routesPerDepot = new HashMap<>();
 
         boolean feasible = true;
         Map<Integer, Depot> depots = problem.getDepots();
         Map<Integer, Customer> customers = problem.getCustomers();
-        for (Map.Entry<Integer, List<Integer>> gene : chromosome.getGenes().entrySet()) {
+        for (Map.Entry<Integer, CustomerSequence> gene : chromosome.getGenes().entrySet()) {
 
             Depot depot = depots.get(gene.getKey());
             int maxVehicleLoad = depot.getMaxVehicleLoad();
@@ -26,7 +28,7 @@ public class RouteScheduler {
             // TODO: Use stream mappings BEWARE STREAMS ARE CONSUMED!
             // gene.getValue().stream().map(customers::get)
 
-            List<List<Integer>> schedule = trivialPhase(gene.getValue(), customers, maxVehicleLoad, numMaxVehicles);
+            Schedule schedule = trivialPhase(gene.getValue(), customers, maxVehicleLoad, numMaxVehicles);
             shiftSchedule(schedule, customers, depot, maxVehicleLoad);
 
             Stream<Stream<Customer>> routeStream = schedule.stream().map(a -> a.stream().map(customers::get));
@@ -94,14 +96,15 @@ public class RouteScheduler {
      * @param depot The depot with the routes in question.
      * @param maxVehicleLoad The maximum load a vehicle can serve in its route.
      */
-    private static void shiftSchedule(List<List<Integer>> schedule, Map<Integer, Customer> customers,
+    //TODO. stream customers from schedule
+    private static void shiftSchedule(Schedule schedule, Map<Integer, Customer> customers,
                                                      Depot depot, int maxVehicleLoad) {
         boolean changed = true;
         while (changed) {
             changed = false;
             var route = schedule.get(0);
             for (int i = 1; i < schedule.size()-1; i++) {
-                List<Integer> nextRoute = schedule.get(i);
+                CustomerSequence nextRoute = schedule.get(i);
                 if (route.size() == 0) {
                     route = nextRoute;
                     continue;
@@ -129,13 +132,14 @@ public class RouteScheduler {
      * @param numMaxVehicles The maximum number of vehicles a depot can send out.
      * @return List of lists (representing routes, containing customerID)
      */
-    private static List<List<Integer>> trivialPhase(List<Integer> geneString, Map<Integer, Customer> customers,
+    //TODO: Use CustomerSequence's customerStream-func
+    private static Schedule trivialPhase(CustomerSequence geneString, Map<Integer, Customer> customers,
                                                     int maxVehicleLoad, int numMaxVehicles) {
-        List<List<Integer>> schedule = new ArrayList<>();
+        Schedule schedule = new Schedule();
 
         int currentBase = 0;
         while (schedule.size() < numMaxVehicles) {
-            List<Integer> route = new ArrayList<>();
+            CustomerSequence route = new CustomerSequence();
 
             int load = 0;
             for (; currentBase < geneString.size(); currentBase++) {

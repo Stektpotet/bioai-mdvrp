@@ -3,6 +3,8 @@ package mdvrp.ga;
 import ga.data.Chromosome;
 import mdvrp.Customer;
 import mdvrp.Depot;
+import mdvrp.collections.CustomerSequence;
+import mdvrp.collections.Schedule;
 
 import java.util.*;
 
@@ -30,19 +32,19 @@ public class Util {
         return fittest;
     }
 
-    public static Map<Integer, List<List<Integer>>> deepCopySchedule(Map<Integer, List<List<Integer>>> original) {
-        Map<Integer, List<List<Integer>>> copy = new HashMap<>();
+    public static Map<Integer, Schedule> deepCopySchedule(Map<Integer, Schedule> original) {
+        Map<Integer, Schedule> copy = new HashMap<>();
 
-        for (Map.Entry<Integer, List<List<Integer>>> depotSchedule : original.entrySet()) {
+        for (Map.Entry<Integer, Schedule> depotSchedule : original.entrySet()) {
 
             // get depot Id
             Integer depotId = depotSchedule.getKey();
 
             // copy routes
-            List<List<Integer>> routesOriginal = depotSchedule.getValue();
-            List<List<Integer>> routesCopy = new ArrayList<>(routesOriginal.size());
-            for (List<Integer> singleRouteOriginal : routesOriginal) {
-                routesCopy.add(new ArrayList<>(singleRouteOriginal));
+            Schedule routesOriginal = depotSchedule.getValue();
+            Schedule routesCopy = new Schedule(routesOriginal.size());
+            for (CustomerSequence singleRouteOriginal : routesOriginal) {
+                routesCopy.add(new CustomerSequence(singleRouteOriginal));
             }
 
             // insert into copied schedule

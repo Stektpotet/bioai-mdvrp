@@ -2,7 +2,10 @@ package mdvrp.ga;
 
 import ga.change.Recombinator;
 import ga.data.Chromosome;
+import mdvrp.Customer;
 import mdvrp.MDVRP;
+import mdvrp.collections.CustomerSequence;
+import mdvrp.collections.Schedule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,28 +26,28 @@ public class RecombinatorMDVRP implements Recombinator<ChromosomeMDVRP> {
 
     @Override
     public List<ChromosomeMDVRP> crossover(ChromosomeMDVRP mum, ChromosomeMDVRP dad) {
-        Map<Integer, List<List<Integer>>> mSchedule = mum.getSchedule(problem);
-        Map<Integer, List<List<Integer>>> dSchedule = dad.getSchedule(problem);
+        Map<Integer, Schedule> mSchedule = mum.getSchedule(problem);
+        Map<Integer, Schedule> dSchedule = dad.getSchedule(problem);
 
         // choose depot (same for both)
         Integer depotId = Util.random.nextInt(mSchedule.size());
-        List<List<Integer>> mDepotRoutes = mSchedule.get(depotId);
-        List<List<Integer>> dDepotRoutes = dSchedule.get(depotId);
+        Schedule mDepotRoutes = mSchedule.get(depotId);
+        Schedule dDepotRoutes = dSchedule.get(depotId);
 
         // choose route (separately for both)
-        List<Integer> mSelectedRoute = mDepotRoutes.get(Util.random.nextInt(mDepotRoutes.size()));
-        List<Integer> dSelectedRoute = dDepotRoutes.get(Util.random.nextInt(dDepotRoutes.size()));
+        CustomerSequence mSelectedRoute = mDepotRoutes.get(Util.random.nextInt(mDepotRoutes.size()));
+        CustomerSequence dSelectedRoute = dDepotRoutes.get(Util.random.nextInt(dDepotRoutes.size()));
 
         // remove and reinsert customers from selected route in the opposite schedule
-        List<List<Integer>> dauDepotRoutes = reinsert(mDepotRoutes, dSelectedRoute);
-        List<List<Integer>> sonDepotRoutes = reinsert(dDepotRoutes, mSelectedRoute);
+        Schedule dauDepotRoutes = reinsert(mDepotRoutes, dSelectedRoute);
+        Schedule sonDepotRoutes = reinsert(dDepotRoutes, mSelectedRoute);
 
         // make new Chromosomes
-        Map<Integer, List<List<Integer>>> daughterSchedule = Util.deepCopySchedule(mSchedule);
+        Map<Integer, Schedule> daughterSchedule = Util.deepCopySchedule(mSchedule);
         daughterSchedule.put(depotId, dauDepotRoutes);
         ChromosomeMDVRP daughter = new ChromosomeMDVRP(daughterSchedule);
 
-        Map<Integer, List<List<Integer>>> sonSchedule = Util.deepCopySchedule(dSchedule);
+        Map<Integer, Schedule> sonSchedule = Util.deepCopySchedule(dSchedule);
         sonSchedule.put(depotId, sonDepotRoutes);
         ChromosomeMDVRP son = new ChromosomeMDVRP(sonSchedule);
 
@@ -58,22 +61,7 @@ public class RecombinatorMDVRP implements Recombinator<ChromosomeMDVRP> {
 
     }
 
-    private List<List<Integer>> reinsert(List<List<Integer>> depotSchedule, List<Integer> toReinsert) {
-        for (var customerId : toReinsert) {
-            if (!depotSchedule.remove(customerId)) {
-                continue;
-            }
-
-            for (var route : depotSchedule) {
-                for (int i = 0; i < route.size() + 1; i++) {
-//                    RouteScheduler.geneFeasibilitz(depotSchedule)
-                    //          if feasible
-                    //              compute insertion cost
-                    //              store in feasibleLocations
-
-                }
-            }
-        }
+    private Schedule reinsert(Schedule depotSchedule, CustomerSequence toReinsert) {
 
         // for each customer in to Reinsert:
         //      take customer out of depotSchedule

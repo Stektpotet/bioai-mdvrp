@@ -4,6 +4,7 @@ import ga.data.Initializer;
 import mdvrp.Customer;
 import mdvrp.Depot;
 import mdvrp.MDVRP;
+import mdvrp.collections.CustomerSequence;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -130,10 +131,10 @@ public class Breeder implements Initializer<PopulationMDVRP, ChromosomeMDVRP> {
 //            isAssignmentCapacityValid(fullAssignment, )
 
             // 3. Convert to IDs
-            Map<Integer, List<Integer>> protoChromosome = new HashMap<>();
+            Map<Integer, CustomerSequence> protoChromosome = new HashMap<>();
             for (Map.Entry<Integer, List<Integer>> entry : fullAssignment.entrySet()) {
 
-                List<Integer> geneString = new ArrayList<>(entry.getValue());
+                CustomerSequence geneString = new CustomerSequence(entry.getValue());
                 protoChromosome.put(entry.getKey(), geneString);
             }
             individuals[i] = new ChromosomeMDVRP(protoChromosome, true);
