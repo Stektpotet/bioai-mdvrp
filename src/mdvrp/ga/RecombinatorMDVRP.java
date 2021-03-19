@@ -8,7 +8,6 @@ import mdvrp.structures.CustomerSequence;
 import mdvrp.structures.Schedule;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -45,11 +44,11 @@ public class RecombinatorMDVRP implements Recombinator<ChromosomeMDVRP> {
         Schedule sonDepotRoutes = reinsert(depot, dDepotRoutes, mSelectedRoute);
 
         // make new Chromosomes
-        Map<Integer, Schedule> daughterSchedule = Util.deepCopySchedule(mSolution);
+        Map<Integer, Schedule> daughterSchedule = Util.deepCopySolution(mSolution);
         daughterSchedule.put(depotId, dauDepotRoutes);
         ChromosomeMDVRP daughter = new ChromosomeMDVRP(daughterSchedule);
 
-        Map<Integer, Schedule> sonSchedule = Util.deepCopySchedule(dSolution);
+        Map<Integer, Schedule> sonSchedule = Util.deepCopySolution(dSolution);
         sonSchedule.put(depotId, sonDepotRoutes);
         ChromosomeMDVRP son = new ChromosomeMDVRP(sonSchedule);
 

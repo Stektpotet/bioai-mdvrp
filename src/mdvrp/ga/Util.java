@@ -27,6 +27,18 @@ public class Util {
     static <T> T randomChoice(List<T> list) {
         return list.get(random.nextInt(list.size()));
     }
+    static <T> T randomChoiceRemove(List<T> list) {
+        return list.remove(random.nextInt(list.size()));
+    }
+
+    static <T> List<T> randomChoiceNoReplacement(List<T> list, int n) { // TODO: Not nice
+        List<T> choice = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            choice.add(list.remove(random.nextInt(list.size())));
+        }
+        return choice;
+//        return list.get(random.nextInt(list.size()));
+    }
 //    static <K, V> V randomChoice(Map<K, V> map) {
 //        return randomChoice(new ArrayList<>(map.values())); // TODO: Not nice
 //    }
@@ -45,7 +57,7 @@ public class Util {
         return fittest;
     }
 
-    public static Map<Integer, Schedule> deepCopySchedule(Map<Integer, Schedule> original) {
+    public static Map<Integer, Schedule> deepCopySolution(Map<Integer, Schedule> original) {
         Map<Integer, Schedule> copy = new HashMap<>();
 
         for (Map.Entry<Integer, Schedule> depotSchedule : original.entrySet()) {
