@@ -3,19 +3,29 @@ package mdvrp.ga;
 import ga.data.Chromosome;
 import mdvrp.Customer;
 import mdvrp.Depot;
-import mdvrp.collections.CustomerSequence;
-import mdvrp.collections.Schedule;
+import mdvrp.structures.CustomerSequence;
+import mdvrp.structures.Schedule;
 
 import java.util.*;
 
 public class Util {
     public static Random random = new Random(69);
-    public static float euclid(Customer a, Customer b) {
+
+    public static double duration(Customer a, Customer b) {
         float x = a.getX() - b.getX();
         float y = a.getY() - b.getY();
         x *= x;
         y *= y;
-        return x + y;
+        return Math.sqrt(x + y);
+    }
+
+
+    static double duration(Customer a, Customer b, Customer c) {
+        return Util.duration(a, b) + Util.duration(b, c);
+    }
+
+    static <T> T randomChoice(List<T> list) {
+        return list.get(random.nextInt(list.size()));
     }
 
 

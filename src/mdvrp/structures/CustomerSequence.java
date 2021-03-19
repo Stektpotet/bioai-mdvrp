@@ -1,4 +1,4 @@
-package mdvrp.collections;
+package mdvrp.structures;
 
 import mdvrp.Customer;
 

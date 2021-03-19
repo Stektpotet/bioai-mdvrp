@@ -3,10 +3,11 @@ package mdvrp.ga;
 import mdvrp.Customer;
 import mdvrp.Depot;
 import mdvrp.MDVRP;
-import mdvrp.collections.CustomerSequence;
-import mdvrp.collections.Schedule;
+import mdvrp.structures.CustomerSequence;
+import mdvrp.structures.Schedule;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -16,78 +17,79 @@ public class RouteScheduler {
     public static Map<Integer, Schedule>  scheduleRoutes(ChromosomeMDVRP chromosome, MDVRP problem) {
         Map<Integer, Schedule> routesPerDepot = new HashMap<>();
 
-        boolean feasible = true;
+        boolean solutionFeasible = true;
         Map<Integer, Depot> depots = problem.getDepots();
         Map<Integer, Customer> customers = problem.getCustomers();
         for (Map.Entry<Integer, CustomerSequence> gene : chromosome.getGenes().entrySet()) {
 
             Depot depot = depots.get(gene.getKey());
             int maxVehicleLoad = depot.getMaxVehicleLoad();
+            double maxVehicleDuration = depot.getMaxDuration();
             int numMaxVehicles = problem.getNumMaxVehicles();
 
             // TODO: Use stream mappings BEWARE STREAMS ARE CONSUMED!
             // gene.getValue().stream().map(customers::get)
 
-            Schedule schedule = trivialPhase(gene.getValue(), customers, maxVehicleLoad, numMaxVehicles);
-            shiftSchedule(schedule, customers, depot, maxVehicleLoad);
+            // TODO: Debug if the boolean type actually gets changed!!
+            Boolean scheduleFeasible = true;
+            Schedule schedule = trivialPhase(depot, gene.getValue(), customers, maxVehicleLoad, maxVehicleDuration,
+                    numMaxVehicles, scheduleFeasible);
 
-            Stream<Stream<Customer>> routeStream = schedule.stream().map(a -> a.stream().map(customers::get));
-            feasible &= geneFeasibility(routeStream, maxVehicleLoad);
+            // REMINDER: shiftSchedule will not work properly if given an infeasible schedule, see REMINDER in method!
+            if (scheduleFeasible) {
+                shiftSchedule(schedule, customers, depot, maxVehicleLoad);
+            }
+
+            solutionFeasible &= scheduleFeasible;
             routesPerDepot.put(depot.getId(), schedule);
         }
-        chromosome.setFeasible(feasible);
+        chromosome.setFeasible(solutionFeasible);
         return Collections.unmodifiableMap(routesPerDepot);
     }
 
-    public static int routeSum(List<Integer> route, Map<Integer, Customer> customers) {
-        return route.stream().map(customers::get).mapToInt(Customer::getDemand).sum();
-    }
 
+
+    public static boolean isInsertionDemandFeasible(Stream<Customer> route, Customer insertion, Depot depot) {
+        return routeDemandSum(route) + insertion.getDemand() <= depot.getMaxVehicleLoad();
+    }
+    public static int routeDemandSum(Stream<Customer> customerStream) {
+        return customerStream.mapToInt(Customer::getDemand).sum();
+    }
 
     public static int depotScheduleSum(List<List<Integer>> depotSchedule, Map<Integer, Customer> customers) {
         return depotSchedule.stream().map(customers::get).mapToInt(Customer::getDemand).sum();
     }
 
-    public static boolean geneFeasibilitz(List<List<Integer>> schedule, Map<Integer, Customer> customers, int maxVehicleLoad) {
-        return geneFeasibility(schedule.stream().map(route -> route.stream().map(customers::get)), maxVehicleLoad);
-    }
-
-    private static boolean geneFeasibility(Stream<Stream<Customer>> routes, int maxVehicleLoad) {
-        return routes.allMatch(routeStream -> maxVehicleLoad >= routeStream.mapToInt(Customer::getDemand).sum());
-    }
-
     /**
      *  Evaluates whether or not a shift results in shorter routes.
-     *  ... -> a -> b -> depot -> c -> ...   vs   ... -> a -> depot -> b -> c -> ...
+     *  ... -> a -> shifting -> depot -> c -> ...   vs   ... -> a -> depot -> shifting -> c -> ...
      *
      * @param a The next to last node in the route to shift from.
-     * @param b The node to shift to the next route.
+     * @param shifting The node to shift to the next route.
      * @param c The first node in the next route.
      * @param depot The depot the routes connect to.
-     * @return true if shifting 'b' to the next route results in shorter routes, false otherwise.
+     * @return true if shifting 'shifting' to the next route results in shorter routes, false otherwise.
      */
-    private static boolean isShiftedShorter(Customer a, Customer b, Customer c, Customer depot) {
-        return Util.euclid(a, b) + Util.euclid(depot, c) > Util.euclid(a, depot) + Util.euclid(b, c);
+    private static boolean isShiftedShorter(Customer a, Customer shifting, Customer c, Customer depot) {
+        double current = Util.duration(a, shifting) + Util.duration(depot, c);
+        double shifted = Util.duration(a, depot) + Util.duration(shifting, c);
+        return current > shifted;
     }
 
     /**
      *  Evaluates whether or not the 'route' can accommodate 'customerToShift' at the beginning of the route without
      *  surpassing the maximum vehicle load.
      * @param customerToShift The customer node to be shifted into 'route'.
-     * @param route The route to consider shift feasibility on.
-     * @param customers The customer map,
+     * @param customerStream The route to consider shift feasibility on.
      * @param maxVehicleLoad
      * @return
      */
-    private static boolean isShiftFeasible(Customer customerToShift, List<Integer> route, Map<Integer, Customer> customers, int maxVehicleLoad) {
-        int load = 0;
-        for (Integer customerID : route) {
-//            route.stream().map(customers::get).mapToInt(Customer::getDemand).sum();
-            load += customers.get(customerID).getDemand();
-        }
+    private static boolean isShiftFeasible(Customer customerToShift, Stream<Customer> customerStream, int maxVehicleLoad) {
+        int load = routeDemandSum(customerStream);
         load += customerToShift.getDemand();
         return load <= maxVehicleLoad;
     }
+
     /**
      *  In-place shifts the last customer of a route to the beginning of the following route
      *  if it overall results in feasible and shorter routes.
@@ -103,7 +105,7 @@ public class RouteScheduler {
         while (changed) {
             changed = false;
             var route = schedule.get(0);
-            for (int i = 1; i < schedule.size()-1; i++) {
+            for (int i = 1; i < schedule.size(); i++) {
                 CustomerSequence nextRoute = schedule.get(i);
                 if (route.size() == 0) {
                     route = nextRoute;
@@ -112,7 +114,10 @@ public class RouteScheduler {
                 Customer a = route.size() == 1 ? depot : customers.get(route.get(route.size() - 2));
                 Customer b = customers.get(route.get(route.size() - 1));
                 Customer c = nextRoute.size() == 0 ? depot : customers.get(nextRoute.get(0));
-                if (isShiftedShorter(a, b, c, depot) && isShiftFeasible(b, nextRoute, customers, maxVehicleLoad)) {
+
+                // REMINDER: as long as we don't shift infeasible trivial schedules, a shorter route will never break
+                //           the maximumDuration constraint.
+                if (isShiftedShorter(a, b, c, depot) && isShiftFeasible(b, nextRoute.streamCustomers(customers), maxVehicleLoad)) {
                     nextRoute.add(0, route.remove(route.size() - 1));
                     changed = true;
                 }
@@ -133,8 +138,9 @@ public class RouteScheduler {
      * @return List of lists (representing routes, containing customerID)
      */
     //TODO: Use CustomerSequence's customerStream-func
-    private static Schedule trivialPhase(CustomerSequence geneString, Map<Integer, Customer> customers,
-                                                    int maxVehicleLoad, int numMaxVehicles) {
+    private static Schedule trivialPhase(Depot depot, CustomerSequence geneString, Map<Integer, Customer> customers,
+                                         int maxVehicleLoad, double maxVehicleDuration, int numMaxVehicles,
+                                         Boolean feasible) {
         Schedule schedule = new Schedule();
 
         int currentBase = 0;
@@ -142,21 +148,29 @@ public class RouteScheduler {
             CustomerSequence route = new CustomerSequence();
 
             int load = 0;
-            for (; currentBase < geneString.size(); currentBase++) {
-                Integer customerID = geneString.get(currentBase);
-                load += customers.get(customerID).getDemand();
+            double travelDuration = 0;
 
-                if (load > maxVehicleLoad) {
+            Customer position = depot;
+
+            for (; currentBase < geneString.size(); currentBase++) {
+                Integer baseId = geneString.get(currentBase);
+                Customer base = customers.get(baseId);
+
+                load += base.getDemand();
+                travelDuration += Util.duration(position, base);
+                double wayBackDuration = Util.duration(base, depot);
+                if (load > maxVehicleLoad || travelDuration + wayBackDuration > maxVehicleDuration) {
                     break;
                 }
 
-                route.add(customerID);
+                position = base;
+                route.add(baseId);
             }
             schedule.add(route);
         }
 
         if (currentBase < geneString.size()) {
-//
+            feasible = false;
             var route = schedule.get(schedule.size() - 1);
             for (; currentBase < geneString.size(); currentBase++) {
                 Integer customerID = geneString.get(currentBase);
@@ -167,39 +181,54 @@ public class RouteScheduler {
     }
 
 
-    /**
-     *  In-place shifts the last customer of a route to the beginning of the following route
-     *  if it overall results in feasible and shorter routes.
-     *
-     *  Different from {@see #shiftSchedule} in that it circularly shifts the customers.
-     *
-     * @param schedule The list of routes for the 'depot' to shift.
-     * @param customers Map of customers. ID -> Customer.
-     * @param depot The depot with the routes in question.
-     * @param maxVehicleLoad The maximum load a vehicle can serve in its route.
-     */
-    private static void shiftScheduleRepeated(List<List<Integer>> schedule, Map<Integer, Customer> customers,
-                                      Depot depot, int maxVehicleLoad) {
-        boolean changed = true;
-        while (changed) {
-            changed = false;
-            for (int i = 0; i < schedule.size(); i++) {
-                List<Integer> route = schedule.get(i); // TODO: mini-optimization possible
-                List<Integer> nextRoute = schedule.get((i + 1) % schedule.size());
-
-                if (route.size() == 0)
-                    continue;
-
-                Customer a = route.size() == 1 ? depot : customers.get(route.get(route.size() - 2));
-                Customer b = customers.get(route.get(route.size() - 1));
-                Customer c = nextRoute.size() == 0 ? depot : customers.get(nextRoute.get(0));
-
-                if (isShiftedShorter(a, b, c, depot) && isShiftFeasible(b, nextRoute, customers, maxVehicleLoad)) {
-                    nextRoute.add(0, route.remove(route.size() - 1));
-                    changed = true;
-                }
-            }
-        }
+//    /**
+//     *  In-place shifts the last customer of a route to the beginning of the following route
+//     *  if it overall results in feasible and shorter routes.
+//     *
+//     *  Different from {@see #shiftSchedule} in that it circularly shifts the customers.
+//     *
+//     * @param schedule The list of routes for the 'depot' to shift.
+//     * @param customers Map of customers. ID -> Customer.
+//     * @param depot The depot with the routes in question.
+//     * @param maxVehicleLoad The maximum load a vehicle can serve in its route.
+//     */
+//    private static void shiftScheduleRepeated(List<List<Integer>> schedule, Map<Integer, Customer> customers,
+//                                      Depot depot, int maxVehicleLoad) {
+//        boolean changed = true;
+//        while (changed) {
+//            changed = false;
+//            for (int i = 0; i < schedule.size(); i++) {
+//                List<Integer> route = schedule.get(i); // TODO: mini-optimization possible
+//                List<Integer> nextRoute = schedule.get((i + 1) % schedule.size());
+//
+//                if (route.size() == 0)
+//                    continue;
+//
+//                Customer a = route.size() == 1 ? depot : customers.get(route.get(route.size() - 2));
+//                Customer b = customers.get(route.get(route.size() - 1));
+//                Customer c = nextRoute.size() == 0 ? depot : customers.get(nextRoute.get(0));
+//
+//                if (isShiftedShorter(a, b, c, depot) && isShiftFeasible(b, nextRoute, customers, maxVehicleLoad)) {
+//                    nextRoute.add(0, route.remove(route.size() - 1));
+//                    changed = true;
+//                }
+//            }
+//        }
+//    }
+    static double getScheduleDuration(Depot depot, Stream<Stream<Customer>> customerStreams) {
+        return customerStreams.mapToDouble(routeStream -> getRouteDuration(depot, routeStream)).sum();
     }
+    static double getRouteDuration(Depot depot, Stream<Customer> route) {
+        List<Customer> routeCustomers = route.collect(Collectors.toList());
 
+        double duration = 0;
+        Customer position = depot;
+        for (Customer customer : routeCustomers) {
+            duration += Util.duration(position, customer);
+            position = customer;
+        }
+        duration += Util.duration(position, depot);
+
+        return duration;
+    }
 }

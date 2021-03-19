@@ -1,8 +1,8 @@
 package mdvrp;
 
 public class Customer {
-    private int id, x, y, duration, demand;
-
+    private int id, x, y, demand;
+    private double duration;
     public int getId() {
         return id;
     }
@@ -15,7 +15,7 @@ public class Customer {
         return y;
     }
 
-    public int getDuration() {
+    public double getDuration() {
         return duration;
     }
 
@@ -35,7 +35,7 @@ public class Customer {
         this.y = y;
     }
 
-    void setDuration(int duration) {
+    void setDuration(int duration) { // TODO: if duration = 0 -> adds a lot of unnecessary computation
         this.duration = duration;
     }
 
