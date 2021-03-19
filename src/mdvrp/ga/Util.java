@@ -27,6 +27,9 @@ public class Util {
     static <T> T randomChoice(List<T> list) {
         return list.get(random.nextInt(list.size()));
     }
+//    static <K, V> V randomChoice(Map<K, V> map) {
+//        return randomChoice(new ArrayList<>(map.values())); // TODO: Not nice
+//    }
 
 
     public static <C extends Chromosome> C ArgMin(List<C> arr) {

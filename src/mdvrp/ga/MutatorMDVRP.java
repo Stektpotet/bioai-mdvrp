@@ -4,6 +4,10 @@ import ga.change.Mutator;
 import mdvrp.Depot;
 import mdvrp.MDVRP;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
     private final MDVRP problem;
     private final float pReversal;
@@ -21,9 +25,9 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
 
     @Override
     public ChromosomeMDVRP mutate(ChromosomeMDVRP chromosome) {
-
+        Map<Integer, Depot> depots = problem.getDepots();
         // 0. Choose depot
-        Depot depot = Util.randomChoice(problem.getDepots());
+        Depot depot = Util.randomChoice(new ArrayList<>(depots.values()));
         // 1. Intra-depot mutations
         intraReversal(depot, chromosome);
         intraReroute(depot, chromosome);
@@ -35,13 +39,13 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
     }
 
     /** TODO: make a randomChoice that accepts a Map<Integer, T>
-     *        finish mutate
-     *  TODO: Implement intraReversal
+     *        finish mutate  [HALVOR]
+     *  TODO: Implement intraReversal [KLARA]
      *  TODO: Implement intraReroute
      *        -> Use recombinator.reinsert (the beautiful code)
      *        -> ChromosomeMDVRPUtil move common functionality from recombinator and this into this Util
      *        -> Move some other things
-     *  TODO: Implement intraSwapping
+     *  TODO: Implement intraSwapping [HALVOR]
      *  TODO: Implement interDepotSwapping
      *        -> Find a goooder name for this
      *
