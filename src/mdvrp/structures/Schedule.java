@@ -28,7 +28,7 @@ public class Schedule extends ArrayList<CustomerSequence> implements Iterable<Cu
         return false;
     }
 
-    // TODO: make this a todo remove the mysteriousness from the naming
+    // TODO: remove the mysteriousness from the naming
     public CustomerSequence underlyingGeneString() {
         return this.stream().flatMap(List::stream).collect(Collectors.toCollection(CustomerSequence::new));
     }
