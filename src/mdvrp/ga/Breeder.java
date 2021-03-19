@@ -35,7 +35,6 @@ public class Breeder implements Initializer<PopulationMDVRP, ChromosomeMDVRP> {
 
     @Override
     public PopulationMDVRP breed(int popSize) {
-        //TODO: maybe, that is not nice! - Klara
         for (var customerList : fixedAssignment.values())
             customerList.clear();
         for (var depotList : swappingMap.values())
