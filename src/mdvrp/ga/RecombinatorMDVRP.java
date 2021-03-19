@@ -39,8 +39,8 @@ public class RecombinatorMDVRP implements Recombinator<ChromosomeMDVRP> {
         CustomerSequence dSelectedRoute = Util.randomChoice(dDepotRoutes);
 
         // remove and reinsert customers from selected route in the opposite schedule
-        Schedule dauDepotRoutes = UtilChromosomeMDVRP.reinsert(problem, depot, mDepotRoutes, dSelectedRoute);
-        Schedule sonDepotRoutes = UtilChromosomeMDVRP.reinsert(problem, depot, dDepotRoutes, mSelectedRoute);
+        Schedule dauDepotRoutes = UtilChromosomeMDVRP.reinsert(problem, depot, mDepotRoutes, dSelectedRoute, 0.8);
+        Schedule sonDepotRoutes = UtilChromosomeMDVRP.reinsert(problem, depot, dDepotRoutes, mSelectedRoute, 0.8);
 
         // make new Chromosomes
         Map<Integer, Schedule> daughterSchedule = Util.deepCopySolution(mSolution);

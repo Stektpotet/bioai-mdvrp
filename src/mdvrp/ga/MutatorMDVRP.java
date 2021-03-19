@@ -36,7 +36,7 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
 
         // 1. Intra-depot mutations
         chromosome = intraReversal(depot, chromosome);
-        intraReroute(depot, chromosome);
+        chromosome = intraReroute(depot, chromosome);
         chromosome = intraSwapping(depot, chromosome);
 
         // 2. inter-depot mutation
@@ -97,7 +97,7 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
         toBeReinserted.add(customerId);
 
         // reroute
-        Schedule mutatedSchedule = UtilChromosomeMDVRP.reinsert(problem, depot, depotSchedule, toBeReinserted);
+        Schedule mutatedSchedule = UtilChromosomeMDVRP.reinsert(problem, depot, depotSchedule, toBeReinserted, 1);
 
         // make and return new Chromosome with mutation
         Map<Integer, Schedule> solutionCopy = Util.deepCopySolution(solution);

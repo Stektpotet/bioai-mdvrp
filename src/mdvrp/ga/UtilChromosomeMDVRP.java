@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class UtilChromosomeMDVRP {
 
-    static Schedule reinsert(MDVRP problem, Depot depot, Schedule schedule, CustomerSequence toReinsert) {
+    static Schedule reinsert(MDVRP problem, Depot depot, Schedule schedule, CustomerSequence toReinsert, double pChooseBestLocation) {
         Map<Integer, Customer> customers = problem.getCustomers();
         Schedule copy = schedule.deepCopy();
 
@@ -66,7 +66,7 @@ public class UtilChromosomeMDVRP {
             //      if feasibleLocations is empty:
             if (!feasibleLocations.isEmpty()) {
                 InsertionLocation insertionLocation;
-                if (Util.random.nextFloat() < 0.8) {
+                if (Util.random.nextFloat() < pChooseBestLocation) {
                     //          choose best location in feasibleLocations
 //                    System.out.println("Choosing best feasible location!");
                     insertionLocation = bestFeasibleLocation;
