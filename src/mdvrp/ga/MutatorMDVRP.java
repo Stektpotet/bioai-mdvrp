@@ -1,8 +1,6 @@
 package mdvrp.ga;
 
 import ga.change.Mutator;
-import ga.data.Chromosome;
-import ga.data.Population;
 import mdvrp.Depot;
 import mdvrp.MDVRP;
 import mdvrp.structures.CustomerSequence;
@@ -35,10 +33,10 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
 
 
         if (pInter > Util.random.nextFloat()) {
-            // 2. inter-depot mutation
+            // Inter-depot mutation
             chromosome = interDepotSwapping(chromosome);
         } else {
-            // 1. Intra-depot mutations
+            // Intra-depot mutations
             chromosome = intraReversal(depot, chromosome);
             chromosome = intraReroute(depot, chromosome);
             chromosome = intraSwapping(depot, chromosome);
@@ -100,7 +98,7 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
         toBeReinserted.add(customerId);
 
         // reroute
-        Schedule mutatedSchedule = UtilChromosomeMDVRP.reinsert(problem, depot, depotSchedule, toBeReinserted, 1);
+        Schedule mutatedSchedule = UtilChromosomeMDVRP.removeAndReinsertAll(problem, depot, depotSchedule, toBeReinserted, 1);
 
         // make and return new Chromosome with mutation
         Map<Integer, Schedule> solutionCopy = UtilChromosomeMDVRP.deepCopySolution(solution);
