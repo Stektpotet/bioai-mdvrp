@@ -1,6 +1,7 @@
 package mdvrp.ga;
 
 import ga.change.Mutator;
+import ga.data.Chromosome;
 import ga.data.Population;
 import mdvrp.Depot;
 import mdvrp.MDVRP;
@@ -32,13 +33,14 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
         // 0. Choose depot
         Depot depot = Util.randomChoice(new ArrayList<>(depots.values()));
 
+
         if (pInter > Util.random.nextFloat()) {
             // 2. inter-depot mutation
-            interDepotSwapping(chromosome);
+            chromosome = interDepotSwapping(chromosome);
         } else {
             // 1. Intra-depot mutations
             chromosome = intraReversal(depot, chromosome);
-            intraReroute(depot, chromosome);
+            chromosome = intraReroute(depot, chromosome);
             chromosome = intraSwapping(depot, chromosome);
         }
 
@@ -50,7 +52,7 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
      *  TODO: make a randomChoice that accepts a Map<Integer, T>
      *        finish mutate  [HALVOR]
      *  TODO: Implement intraReversal [KLARA]
-     *  TODO: Implement intraReroute
+     *  TODO: Implement intraReroute [KLARA]
      *        -> Use recombinator.reinsert (the beautiful code)
      *        -> ChromosomeMDVRPUtil move common functionality from recombinator and this into this Util
      *        -> Move some other things
@@ -77,20 +79,40 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
         Collections.reverse(depotGeneString.subList(Math.min(i, j), Math.max(j, i)));
 
         // make and return new Chromosome with mutation
-        Map<Integer, CustomerSequence> genes = chromosome.deepCopyGenes();
+        Map<Integer, CustomerSequence> genes = UtilChromosomeMDVRP.deepCopyGenes(chromosome);
         genes.put(depot.getId(), depotGeneString);
         return new ChromosomeMDVRP(genes, false);
     }
 
-    private void intraReroute(Depot depot, ChromosomeMDVRP chromosome) {
+    public ChromosomeMDVRP intraReroute(Depot depot, ChromosomeMDVRP chromosome) {
 
+        // check if mutation applicable
+        if (Util.random.nextFloat() > pReroute) {
+            return chromosome;
+        }
+
+        Map<Integer, Schedule> solution = chromosome.getSolution(problem);
+        Schedule depotSchedule = solution.get(depot.getId());
+
+        // choose customer to be rerouted
+        Integer customerId = Util.randomChoice(depotSchedule.underlyingGeneString());
+        CustomerSequence toBeReinserted = new CustomerSequence();
+        toBeReinserted.add(customerId);
+
+        // reroute
+        Schedule mutatedSchedule = UtilChromosomeMDVRP.reinsert(problem, depot, depotSchedule, toBeReinserted, 1);
+
+        // make and return new Chromosome with mutation
+        Map<Integer, Schedule> solutionCopy = UtilChromosomeMDVRP.deepCopySolution(solution);
+       solutionCopy.put(depot.getId(), mutatedSchedule);
+       return new ChromosomeMDVRP(solutionCopy);
     }
 
     private ChromosomeMDVRP intraSwapping(Depot depot, ChromosomeMDVRP chromosome) {
         if (Util.random.nextFloat() > pSwapping)
             return chromosome;
 
-        var soultion = Util.deepCopySolution(chromosome.getSolution(problem));
+        var soultion = UtilChromosomeMDVRP.deepCopySolution(chromosome.getSolution(problem));
         Schedule schedule = soultion.get(depot.getId());
 
         List<Integer> nonEmptyRouteIdx = IntStream.rangeClosed(0, schedule.size() - 1).filter(
@@ -102,8 +124,8 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
 
         var idxSwapA = Util.random.nextInt(routeA.size());
         var idxSwapB = Util.random.nextInt(routeB.size());
-        // DO the swap
 
+        // DO the swap
         var a = routeA.remove(idxSwapA);
         var b = routeB.remove(idxSwapB);
 
@@ -115,7 +137,7 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
         return new ChromosomeMDVRP(soultion);
     }
 
-    private void interDepotSwapping(Map<Integer, List<Integer>> swapMap, ChromosomeMDVRP chromosome) {
-
+    private ChromosomeMDVRP interDepotSwapping(Map<Integer, List<Integer>> swapMap, ChromosomeMDVRP chromosome) {
+        return null;
     }
 }

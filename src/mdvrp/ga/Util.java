@@ -28,6 +28,7 @@ public class Util {
         return list.get(random.nextInt(list.size()));
     }
 
+<<<<<<< HEAD
     static <T> T randomChoice(Set<T> set) {
         int selectionIndex = random.nextInt(set.size());
         var iter = set.iterator();
@@ -38,6 +39,8 @@ public class Util {
     }
 
 
+=======
+>>>>>>> 19258bd03983468817e83ed9cb857f84dcaa5e17
     static <T> T randomChoiceRemove(List<T> list) {
         return list.remove(random.nextInt(list.size()));
     }
@@ -66,28 +69,6 @@ public class Util {
             }
         }
         return fittest;
-    }
-
-    public static Map<Integer, Schedule> deepCopySolution(Map<Integer, Schedule> original) {
-        Map<Integer, Schedule> copy = new HashMap<>();
-
-        for (Map.Entry<Integer, Schedule> depotSchedule : original.entrySet()) {
-
-            // get depot Id
-            Integer depotId = depotSchedule.getKey();
-
-            // copy routes
-            Schedule routesOriginal = depotSchedule.getValue();
-            Schedule routesCopy = new Schedule(routesOriginal.size());
-            for (CustomerSequence singleRouteOriginal : routesOriginal) {
-                routesCopy.add(new CustomerSequence(singleRouteOriginal));
-            }
-
-            // insert into copied schedule
-            copy.put(depotId, routesCopy);
-        }
-
-        return copy;
     }
 
     private static boolean isAssignmentCapacityValid(Map<Depot, List<Customer>> assignment, int numVehicles) {
