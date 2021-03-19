@@ -1,15 +1,13 @@
 package mdvrp.ga;
 
 import ga.change.Mutator;
+import ga.data.Population;
 import mdvrp.Depot;
 import mdvrp.MDVRP;
 import mdvrp.structures.CustomerSequence;
 import mdvrp.structures.Schedule;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -34,13 +32,16 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
         // 0. Choose depot
         Depot depot = Util.randomChoice(new ArrayList<>(depots.values()));
 
-        // 1. Intra-depot mutations
-        chromosome = intraReversal(depot, chromosome);
-        intraReroute(depot, chromosome);
-        chromosome = intraSwapping(depot, chromosome);
+        if (pInter > Util.random.nextFloat()) {
+            // 2. inter-depot mutation
+            interDepotSwapping(chromosome);
+        } else {
+            // 1. Intra-depot mutations
+            chromosome = intraReversal(depot, chromosome);
+            intraReroute(depot, chromosome);
+            chromosome = intraSwapping(depot, chromosome);
+        }
 
-        // 2. inter-depot mutation
-        interDepotSwapping(chromosome);
         return chromosome;
     }
 
@@ -113,7 +114,8 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
 
         return new ChromosomeMDVRP(soultion);
     }
-    private void interDepotSwapping(ChromosomeMDVRP chromosome) {
+
+    private void interDepotSwapping(Map<Integer, List<Integer>> swapMap, ChromosomeMDVRP chromosome) {
 
     }
 }

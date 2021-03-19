@@ -12,7 +12,7 @@ public class ParentSelectorMDVRP implements ParentSelector<ChromosomeMDVRP> {
     private int poolSize;
     private int numParents;
 
-    ParentSelectorMDVRP(int poolSize, int numParents) {
+    public ParentSelectorMDVRP(int poolSize, int numParents) {
 
         this.poolSize = poolSize;
         this.numParents = numParents;

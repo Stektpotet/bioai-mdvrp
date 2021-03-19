@@ -27,6 +27,17 @@ public class Util {
     static <T> T randomChoice(List<T> list) {
         return list.get(random.nextInt(list.size()));
     }
+
+    static <T> T randomChoice(Set<T> set) {
+        int selectionIndex = random.nextInt(set.size());
+        var iter = set.iterator();
+        for (int i = 0; i < selectionIndex; i++) {
+            iter.next();
+        }
+        return iter.next();
+    }
+
+
     static <T> T randomChoiceRemove(List<T> list) {
         return list.remove(random.nextInt(list.size()));
     }
