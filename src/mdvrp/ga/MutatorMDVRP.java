@@ -49,7 +49,7 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
      *  TODO: make a randomChoice that accepts a Map<Integer, T>
      *        finish mutate  [HALVOR]
      *  TODO: Implement intraReversal [KLARA]
-     *  TODO: Implement intraReroute
+     *  TODO: Implement intraReroute [KLARA]
      *        -> Use recombinator.reinsert (the beautiful code)
      *        -> ChromosomeMDVRPUtil move common functionality from recombinator and this into this Util
      *        -> Move some other things
@@ -81,8 +81,28 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
         return new ChromosomeMDVRP(genes, false);
     }
 
-    private void intraReroute(Depot depot, ChromosomeMDVRP chromosome) {
+    public ChromosomeMDVRP intraReroute(Depot depot, ChromosomeMDVRP chromosome) {
 
+        // check if mutation applicable
+        if (Util.random.nextFloat() > pReroute) {
+            return chromosome;
+        }
+
+        Map<Integer, Schedule> solution = chromosome.getSolution(problem);
+        Schedule depotSchedule = solution.get(depot.getId());
+
+        // choose customer to be rerouted
+        Integer customerId = Util.randomChoice(depotSchedule.underlyingGeneString());
+        CustomerSequence toBeReinserted = new CustomerSequence();
+        toBeReinserted.add(customerId);
+
+        // reroute
+        Schedule mutatedSchedule = UtilChromosomeMDVRP.reinsert(problem, depot, depotSchedule, toBeReinserted);
+
+        // make and return new Chromosome with mutation
+        Map<Integer, Schedule> solutionCopy = Util.deepCopySolution(solution);
+       solutionCopy.put(depot.getId(), mutatedSchedule);
+       return new ChromosomeMDVRP(solutionCopy);
     }
 
     private ChromosomeMDVRP intraSwapping(Depot depot, ChromosomeMDVRP chromosome) {
