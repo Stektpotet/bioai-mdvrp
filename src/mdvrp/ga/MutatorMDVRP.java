@@ -3,6 +3,13 @@ package mdvrp.ga;
 import ga.change.Mutator;
 import mdvrp.Depot;
 import mdvrp.MDVRP;
+import mdvrp.structures.CustomerSequence;
+import mdvrp.structures.Schedule;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +22,7 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
     private final float pSwapping;
     private final float pInter;
 
-    MutatorMDVRP(MDVRP problem, float pReversal, float pReroute, float pSwapping, float pInter) {
+    public MutatorMDVRP(MDVRP problem, float pReversal, float pReroute, float pSwapping, float pInter) {
         this.problem = problem;
         this.pReversal = pReversal;
         this.pReroute = pReroute;
@@ -28,6 +35,7 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
         Map<Integer, Depot> depots = problem.getDepots();
         // 0. Choose depot
         Depot depot = Util.randomChoice(new ArrayList<>(depots.values()));
+
         // 1. Intra-depot mutations
         intraReversal(depot, chromosome);
         intraReroute(depot, chromosome);
@@ -51,8 +59,26 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
      *
     **/
 
-    private void intraReversal(Depot depot, ChromosomeMDVRP chromosome) {
+    private ChromosomeMDVRP intraReversal(Depot depot, ChromosomeMDVRP chromosome) {
 
+        // check if mutation applicable
+        if (Util.random.nextFloat() > pReversal) {
+            return chromosome;
+        }
+
+        Schedule depotSchedule = chromosome.getSolution(problem).get(depot.getId());
+        CustomerSequence depotGeneString = depotSchedule.underlyingGeneString();
+
+        // choose start and stop uniformly at random and reverse Customers in between
+        int positionBound = depotGeneString.size() + 1;
+        int i = Util.random.nextInt(positionBound);
+        int j = Util.random.nextInt(positionBound);
+        Collections.reverse(depotGeneString.subList(Math.min(i, j), Math.max(j, i)));
+
+        // make and return new Chromosome with mutation
+        Map<Integer, CustomerSequence> genes = chromosome.deepCopyGenes();
+        genes.put(depot.getId(), depotGeneString);
+        return new ChromosomeMDVRP(genes, false);
     }
 
     private void intraReroute(Depot depot, ChromosomeMDVRP chromosome) {
