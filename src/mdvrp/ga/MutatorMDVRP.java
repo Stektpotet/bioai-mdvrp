@@ -76,7 +76,7 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
         Collections.reverse(depotGeneString.subList(Math.min(i, j), Math.max(j, i)));
 
         // make and return new Chromosome with mutation
-        Map<Integer, CustomerSequence> genes = chromosome.deepCopyGenes();
+        Map<Integer, CustomerSequence> genes = UtilChromosomeMDVRP.deepCopyGenes(chromosome);
         genes.put(depot.getId(), depotGeneString);
         return new ChromosomeMDVRP(genes, false);
     }
@@ -100,7 +100,7 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
         Schedule mutatedSchedule = UtilChromosomeMDVRP.reinsert(problem, depot, depotSchedule, toBeReinserted, 1);
 
         // make and return new Chromosome with mutation
-        Map<Integer, Schedule> solutionCopy = Util.deepCopySolution(solution);
+        Map<Integer, Schedule> solutionCopy = UtilChromosomeMDVRP.deepCopySolution(solution);
        solutionCopy.put(depot.getId(), mutatedSchedule);
        return new ChromosomeMDVRP(solutionCopy);
     }
@@ -109,7 +109,7 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
         if (Util.random.nextFloat() > pSwapping)
             return chromosome;
 
-        var soultion = Util.deepCopySolution(chromosome.getSolution(problem));
+        var soultion = UtilChromosomeMDVRP.deepCopySolution(chromosome.getSolution(problem));
         Schedule schedule = soultion.get(depot.getId());
 
         List<Integer> nonEmptyRouteIdx = IntStream.rangeClosed(0, schedule.size() - 1).filter(

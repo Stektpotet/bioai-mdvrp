@@ -91,12 +91,4 @@ public class ChromosomeMDVRP implements Chromosome {
         return fitness;
     }
 
-    public Map<Integer, CustomerSequence> deepCopyGenes() {
-        Map<Integer, CustomerSequence> copy = new HashMap<>(this.genes.size());
-        for (Map.Entry<Integer, CustomerSequence> gene : this.genes.entrySet()) {
-            copy.put(gene.getKey(), new CustomerSequence(gene.getValue()));
-        }
-        return copy;
-    }
-
 }

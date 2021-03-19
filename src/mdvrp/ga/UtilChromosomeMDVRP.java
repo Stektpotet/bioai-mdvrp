@@ -7,10 +7,42 @@ import mdvrp.structures.CustomerSequence;
 import mdvrp.structures.Schedule;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class UtilChromosomeMDVRP {
+
+    public static Map<Integer, Schedule> deepCopySolution(Map<Integer, Schedule> original) {
+        Map<Integer, Schedule> copy = new HashMap<>();
+
+        for (Map.Entry<Integer, Schedule> depotSchedule : original.entrySet()) {
+
+            // get depot Id
+            Integer depotId = depotSchedule.getKey();
+
+            // copy routes
+            Schedule routesOriginal = depotSchedule.getValue();
+            Schedule routesCopy = new Schedule(routesOriginal.size());
+            for (CustomerSequence singleRouteOriginal : routesOriginal) {
+                routesCopy.add(new CustomerSequence(singleRouteOriginal));
+            }
+
+            // insert into copied schedule
+            copy.put(depotId, routesCopy);
+        }
+
+        return copy;
+    }
+
+    public static Map<Integer, CustomerSequence> deepCopyGenes(ChromosomeMDVRP chromosome) {
+        Map<Integer, CustomerSequence> genes = chromosome.getGenes();
+        Map<Integer, CustomerSequence> copy = new HashMap<>(genes.size());
+        for (Map.Entry<Integer, CustomerSequence> gene : genes.entrySet()) {
+            copy.put(gene.getKey(), new CustomerSequence(gene.getValue()));
+        }
+        return copy;
+    }
 
     static Schedule reinsert(MDVRP problem, Depot depot, Schedule schedule, CustomerSequence toReinsert, double pChooseBestLocation) {
         Map<Integer, Customer> customers = problem.getCustomers();

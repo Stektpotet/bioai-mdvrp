@@ -43,11 +43,11 @@ public class RecombinatorMDVRP implements Recombinator<ChromosomeMDVRP> {
         Schedule sonDepotRoutes = UtilChromosomeMDVRP.reinsert(problem, depot, dDepotRoutes, mSelectedRoute, 0.8);
 
         // make new Chromosomes
-        Map<Integer, Schedule> daughterSchedule = Util.deepCopySolution(mSolution);
+        Map<Integer, Schedule> daughterSchedule = UtilChromosomeMDVRP.deepCopySolution(mSolution);
         daughterSchedule.put(depotId, dauDepotRoutes);
         ChromosomeMDVRP daughter = new ChromosomeMDVRP(daughterSchedule);
 
-        Map<Integer, Schedule> sonSchedule = Util.deepCopySolution(dSolution);
+        Map<Integer, Schedule> sonSchedule = UtilChromosomeMDVRP.deepCopySolution(dSolution);
         sonSchedule.put(depotId, sonDepotRoutes);
         ChromosomeMDVRP son = new ChromosomeMDVRP(sonSchedule);
 
