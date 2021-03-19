@@ -1,15 +1,15 @@
 package mdvrp;
 
 public class Depot extends Customer {
-    private int maxDuration = 0;
+    private double maxDuration = 0;
     private int maxVehicleLoad = 0;
 
-    public int getMaxDuration() {
+    public double getMaxDuration() {
         return maxDuration;
     }
 
     void setMaxDuration(int maxDuration) {
-        this.maxDuration = maxDuration;
+        this.maxDuration = maxDuration == 0 ? Double.POSITIVE_INFINITY : maxDuration;
     }
 
     public int getMaxVehicleLoad() {

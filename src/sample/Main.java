@@ -1,5 +1,6 @@
 package sample;
 
+import ga.data.Initializer;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -36,7 +37,15 @@ public class Main extends Application {
 
     public static void main(String[] args) {
 //        launch(args);
-        var problem = MDVRPFiles.ReadFile("res/problems/p21");
+        var problem = MDVRPFiles.ReadFile("res/problems/p01");
+
+        Breeder breeder = new Breeder(problem, 0);
+        PopulationMDVRP pop = breeder.breed(2);
+        RecombinatorMDVRP recombinator = new RecombinatorMDVRP(problem);
+
+        var individuals = pop.getIndividuals();
+
+        recombinator.crossover(individuals.get(0), individuals.get(1));
 
     }
 

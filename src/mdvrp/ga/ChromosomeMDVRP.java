@@ -4,8 +4,8 @@ import ga.data.Chromosome;
 import mdvrp.Customer;
 import mdvrp.MDVRP;
 import mdvrp.MDVRPFiles;
-import mdvrp.collections.CustomerSequence;
-import mdvrp.collections.Schedule;
+import mdvrp.structures.CustomerSequence;
+import mdvrp.structures.Schedule;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,7 +25,7 @@ public class ChromosomeMDVRP implements Chromosome {
         // https://stackoverflow.com/questions/8559092/create-an-array-of-arraylists
         genes = customersPerDepot;
         if (shuffle) {
-            customersPerDepot.values().forEach(Collections::shuffle);
+            customersPerDepot.values().forEach(geneString -> Collections.shuffle(geneString, Util.random));
         }
     }
 
@@ -53,7 +53,7 @@ public class ChromosomeMDVRP implements Chromosome {
         return feasible;
     }
 
-    Map<Integer, Schedule> getSchedule(MDVRP problem)  {
+    Map<Integer, Schedule> getSolution(MDVRP problem)  {
         if (!scheduled) {
             solution = RouteScheduler.scheduleRoutes(this, problem);
             scheduled = true;
@@ -67,19 +67,19 @@ public class ChromosomeMDVRP implements Chromosome {
 
     private float fitness(MDVRP problem) {
 
-        getSchedule(problem);
+        getSolution(problem);
 
         float fitness = 0;
         // loop over depots - routes - customers and add distance
         for (var routesPerDepot : solution.entrySet()) {
             Customer depot = problem.getDepots().get(routesPerDepot.getKey());
             for (List<Integer> route : routesPerDepot.getValue()) {
-                Customer position = depot; // start route add depo
+                Customer position = depot; // start route at depo
                 for (Customer base : route.stream().map(problem.getCustomers()::get).collect(Collectors.toList())) {
-                    fitness += Util.euclid(position, base);
+                    fitness += Util.duration(position, base);
                     position = base;
                 }
-                fitness += Util.euclid(position, depot); // end route at depot
+                fitness += Util.duration(position, depot); // end route at depot
             }
         }
 

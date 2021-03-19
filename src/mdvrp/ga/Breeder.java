@@ -4,7 +4,7 @@ import ga.data.Initializer;
 import mdvrp.Customer;
 import mdvrp.Depot;
 import mdvrp.MDVRP;
-import mdvrp.collections.CustomerSequence;
+import mdvrp.structures.CustomerSequence;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,17 +50,17 @@ public class Breeder implements Initializer<PopulationMDVRP, ChromosomeMDVRP> {
         Map<Integer, Depot> depots = problem.getDepots();
 
         // reusable distanceMap
-        Map<Depot, Float> distanceMap = new HashMap<>(depots.size());
+        Map<Depot, Double> distanceMap = new HashMap<>(depots.size());
 
         // create a map from depots to distances
         for (Customer c : customers.values())
         {
             // initialise closest
-            float minimumDistance = Float.MAX_VALUE;
+            double minimumDistance = Double.MAX_VALUE;
             Depot closestDepot = depots.get(0);
 
             for (Depot d : depots.values()) {
-                float distance = Util.euclid(d, c);
+                double distance = Util.duration(d, c);
                 distanceMap.put(d, distance);
 
                 // update closest
@@ -84,7 +84,7 @@ public class Breeder implements Initializer<PopulationMDVRP, ChromosomeMDVRP> {
         }
     }
 
-    private List<Depot> depotsInSwappingDistance(Map<Depot, Float> distanceMap, float minimumDistance, Depot closestDepot) {
+    private List<Depot> depotsInSwappingDistance(Map<Depot, Double> distanceMap, double minimumDistance, Depot closestDepot) {
         Map<Integer, Depot> depots = problem.getDepots();
         List<Depot> depotsInSwappingDistance = new ArrayList<>();
 
@@ -92,7 +92,7 @@ public class Breeder implements Initializer<PopulationMDVRP, ChromosomeMDVRP> {
         for (Depot d1 : depots.values()) {
             if (closestDepot == d1)
                 continue;
-            float comparison = distanceMap.get(d1) - minimumDistance;
+            double comparison = distanceMap.get(d1) - minimumDistance;
 
             if (Math.abs(comparison) < swappingDistance) {
                 depotsInSwappingDistance.add(d1);

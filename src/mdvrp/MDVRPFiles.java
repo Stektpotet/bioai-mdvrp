@@ -38,15 +38,15 @@ public class MDVRPFiles {
                 fileReader.nextLine();
             }
             for (int i = 0; i < numDepots; i++) {
-                Depot vertex = new Depot(); // TODO: We actually dont need the ID to be stored in the data anymore
-                vertex.setId(fileReader.nextInt());
-                vertex.setX(fileReader.nextInt());
-                vertex.setY(fileReader.nextInt());
-                vertex.setDuration(fileReader.nextInt());
-                vertex.setDemand(fileReader.nextInt());
-                vertex.setMaxDuration(maxDuration[i]);
-                vertex.setMaxVehicleLoad(maxLoad[i]);
-                depots.put(vertex.getId(), vertex);
+                Depot depot = new Depot();
+                depot.setId(fileReader.nextInt());
+                depot.setX(fileReader.nextInt());
+                depot.setY(fileReader.nextInt());
+                depot.setDuration(fileReader.nextInt());
+                depot.setDemand(fileReader.nextInt());
+                depot.setMaxDuration(maxDuration[i]);
+                depot.setMaxVehicleLoad(maxLoad[i]);
+                depots.put(depot.getId(), depot);
                 fileReader.nextLine();
             }
             fileReader.close();

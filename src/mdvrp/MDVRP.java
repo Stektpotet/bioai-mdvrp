@@ -9,6 +9,8 @@ public class MDVRP {
     private Map<Integer, Customer> customers;
     private Map<Integer, Depot> depots;
 
+    private Map<Integer, Customer> allVertices; // TODO
+
     private int numMaxVehicles = 0;
 
     MDVRP(int numMaxVehicles, int numCustomers, int numDepots) {
