@@ -53,7 +53,7 @@ public class ChromosomeMDVRP implements Chromosome {
         return feasible;
     }
 
-    Map<Integer, Schedule> getSolution(MDVRP problem)  {
+    public Map<Integer, Schedule> getSolution(MDVRP problem)  {
         if (!scheduled) {
             solution = RouteScheduler.scheduleRoutes(this, problem);
             scheduled = true;

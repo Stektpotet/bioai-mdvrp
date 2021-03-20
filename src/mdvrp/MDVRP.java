@@ -6,14 +6,14 @@ import java.util.*;
  * Multi-Depot Vehicle Routing Problem
  */
 public class MDVRP {
-    private Map<Integer, Customer> customers;
-    private Map<Integer, Depot> depots;
-
-    private Map<Integer, Customer> allVertices; // TODO
+    private final String name;
+    private final Map<Integer, Customer> customers;
+    private final Map<Integer, Depot> depots;
 
     private int numMaxVehicles = 0;
 
-    MDVRP(int numMaxVehicles, int numCustomers, int numDepots) {
+    MDVRP(String name, int numMaxVehicles, int numCustomers, int numDepots) {
+        this.name = name;
         this.numMaxVehicles = numMaxVehicles;
         customers = new HashMap<>(numCustomers);
         depots = new HashMap<>(numDepots);
@@ -44,5 +44,9 @@ public class MDVRP {
     }
     public Map<Integer, Customer> getCustomers() {
         return Collections.unmodifiableMap(customers);
+    }
+
+    public String getName() {
+        return name;
     }
 }

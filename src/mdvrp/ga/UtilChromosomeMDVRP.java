@@ -65,15 +65,15 @@ public class UtilChromosomeMDVRP {
         reinsertSingleCustomer(depot, pChooseBestLocation, customers, copy, toReinsertId, customerToReinsert);
     }
 
-    static void reinsertSingleCustomer(Depot depot, double pChooseBestLocation, Map<Integer, Customer> customers, Schedule copy, Integer toReinsertId, Customer customerToReinsert) {
+    static void reinsertSingleCustomer(Depot depot, double pChooseBestLocation, Map<Integer, Customer> customers, Schedule receiving, Integer toReinsertId, Customer customerToReinsert) {
         // Initialisation with zero is necessary for compilation (used only if list is not empty)
         InsertionLocation bestFeasibleLocation = new InsertionLocation(0, 0);
         List<InsertionLocation> feasibleLocations = new ArrayList<>();
         double bestAdditionalDuration = Double.MAX_VALUE;
 
         // for each locations in depotSchedule:
-        for (int routeIndex = 0; routeIndex < copy.size(); routeIndex++) {
-            CustomerSequence route = copy.get(routeIndex);
+        for (int routeIndex = 0; routeIndex < receiving.size(); routeIndex++) {
+            CustomerSequence route = receiving.get(routeIndex);
             if (!RouteScheduler.isInsertionDemandFeasible(route.streamCustomers(customers), customerToReinsert, depot))
                 continue;
 
@@ -119,13 +119,13 @@ public class UtilChromosomeMDVRP {
 //                    System.out.println("Choosing random feasible location!");
                 insertionLocation = Util.randomChoice(feasibleLocations);
             }
-            insertionRoute = copy.get(insertionLocation.getRouteIndex());
+            insertionRoute = receiving.get(insertionLocation.getRouteIndex());
             insertionLocationIndex = insertionLocation.getCustomerIndex();
         } else {
             //randomly choose route and location within route
 //                System.out.println("Everything unfeasible! Selecting random insertion route!");
 
-            insertionRoute = Util.randomChoice(copy);
+            insertionRoute = Util.randomChoice(receiving);
             insertionLocationIndex = Util.random.nextInt(insertionRoute.size());
         }
         insertionRoute.add(insertionLocationIndex, toReinsertId);

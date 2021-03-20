@@ -1,7 +1,6 @@
 package sample;
 
-import ga.data.Initializer;
-import ga.selection.ParentSelector;
+import ga.GeneticAlgorithmRunner;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -19,7 +18,6 @@ public class Main extends Application {
     static final int SCREEN_WIDTH = 896, SCREEN_HEIGHT = 896;
 
     MDVRPVisualizer visualizer;
-    PopulationMDVRP population;
     MDVRP problem;
     // BASED ON THIS
     // https://jvm-gaming.org/t/looking-for-the-simplest-practical-javafx-game-loop/55903
@@ -34,26 +32,9 @@ public class Main extends Application {
             before = now;
         }
     }
-
+        // TODO: Cleanup
     public static void main(String[] args) {
-//        launch(args);
-        var problem = MDVRPFiles.ReadFile("res/problems/p01");
-
-        Breeder breeder = new Breeder(problem, 2);
-        PopulationMDVRP pop = breeder.breed(2);
-        RecombinatorMDVRP recombinator = new RecombinatorMDVRP(problem);
-        MutatorMDVRP mutator = new MutatorMDVRP(problem, .8f, .8f, .8f, .5f);
-        ParentSelectorMDVRP parentSelector = new ParentSelectorMDVRP(2, 2, 0.8);
-        SurvivorSelectorMDVRP survivorSelector = new SurvivorSelectorMDVRP();
-
-        var individuals = pop.getIndividuals();
-
-        recombinator.crossover(individuals.get(0), individuals.get(1));
-        GeneticAlgorithm<PopulationMDVRP, ChromosomeMDVRP> geneticAlgorithm = new GeneticAlgorithm<>(breeder,
-                recombinator, mutator, parentSelector, survivorSelector);
-
-        geneticAlgorithm.run(50,  10000);
-
+        launch(args);
     }
 
     @Override
@@ -74,14 +55,33 @@ public class Main extends Application {
         visualizer = new MDVRPVisualizer(canvas.getGraphicsContext2D());
         visualizer.calibrateVisualizer(problem);
 
-        new UpdateLoop().start();
+        Breeder breeder = new Breeder(problem, 9);
+        RecombinatorMDVRP recombinator = new RecombinatorMDVRP(problem);
+        MutatorMDVRP mutator = new MutatorMDVRP(problem, 0.3f, 0.7f, 0.9f, 1.0f);
+        ParentSelectorMDVRP parentSelector = new ParentSelectorMDVRP(2,2, 0.7);
+        SurvivorSelectorMDVRP survivorSelector = new SurvivorSelectorMDVRP();
+
+        var gaListener = new GeneticAlgorithmRunner<>(
+                breeder, recombinator, mutator, parentSelector, survivorSelector, 2, 20000
+        );
+        gaListener.valueProperty().addListener((obs, oldChromosome, newChromosome) -> {
+            if (newChromosome != null) {
+                visualizer.clear();
+                visualizer.drawAll(problem, newChromosome.getSolution(problem));
+            }
+        });
+        gaListener.setOnSucceeded(event -> {
+            MDVRPFiles.WriteFile(problem, gaListener.getValue(), String.format("solutions/%s.res", problem.getName()));
+        });
+        gaListener.start();
+
+//        new UpdateLoop().start();
         primaryStage.show();
     }
 
     private boolean initializeProblem() {
-        problem = MDVRPFiles.ReadFile("res/problems/p21");
-        if (problem == null)
-            return false;
+        problem = ChromosomeMDVRP.PROBLEM;
+//        problem = MDVRPFiles.ReadFile("res/problems/p11");
         return true;
     }
 

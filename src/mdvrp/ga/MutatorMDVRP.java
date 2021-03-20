@@ -35,7 +35,8 @@ public class MutatorMDVRP implements Mutator<PopulationMDVRP, ChromosomeMDVRP> {
 
         if (pInter > Util.random.nextFloat()) {
             // Inter-depot mutation
-            chromosome = interDepotSwapping(population.getSwappingMap(), chromosome);
+            var chromosome1 = interDepotSwapping(population.getSwappingMap(), chromosome);
+            chromosome = chromosome1;
         } else {
             // Intra-depot mutations
             chromosome = intraReversal(depot, chromosome);
@@ -46,20 +47,7 @@ public class MutatorMDVRP implements Mutator<PopulationMDVRP, ChromosomeMDVRP> {
         return chromosome;
     }
 
-    /** TODO: Make the toString function work again
-     *
-     *  TODO: make a randomChoice that accepts a Map<Integer, T>
-     *        finish mutate  [HALVOR]
-     *  TODO: Implement intraReversal [KLARA]
-     *  TODO: Implement intraReroute [KLARA]
-     *        -> Use recombinator.reinsert (the beautiful code)
-     *        -> ChromosomeMDVRPUtil move common functionality from recombinator and this into this Util
-     *        -> Move some other things
-     *  TODO: Implement intraSwapping [HALVOR]
-     *  TODO: Implement interDepotSwapping
-     *        -> Find a goooder name for this
-     *
-    **/
+    // TODO: Make the toString function work again
 
     private ChromosomeMDVRP intraReversal(Depot depot, ChromosomeMDVRP chromosome) {
 
@@ -150,11 +138,14 @@ public class MutatorMDVRP implements Mutator<PopulationMDVRP, ChromosomeMDVRP> {
             // if the genekey i.e. the depot id of the gene we're looking at does not occur in the list of possible
             // depots for this customer to be in, then it's not in this gene the customer occurs - i.e. customerID
             // cannot be found in this depot's customer assignment.
-            if (!possibleDepotIdsToMoveInto.contains(gene.getKey()))
+            if (!possibleDepotIdsToMoveInto.contains(gene.getKey())) {
+                System.out.println("gene key not in possibleDepotsToMoveInto");
                 continue;
+            }
             var geneString = gene.getValue();
             // If the gene is the one with the customer in it.
             if (geneString.remove(customerID)) {
+                System.out.println(String.format("depot %d has customerID: %d", gene.getKey(), customerID));
                 possibleDepotIdsToMoveInto.remove(gene.getKey());
                 break;
             }
@@ -162,6 +153,8 @@ public class MutatorMDVRP implements Mutator<PopulationMDVRP, ChromosomeMDVRP> {
 
         var depotId = Util.randomChoice(possibleDepotIdsToMoveInto);
         var depot = problem.getDepots().get(depotId);
+        System.out.println(String.format("Move customer %d into depot %d", customerID, depotId));
+
 
         UtilChromosomeMDVRP.reinsertSingleCustomer(depot, 1., problem.getCustomers(),
                 mutateSolution.get(depotId), customerID, problem.getCustomers().get(customerID)

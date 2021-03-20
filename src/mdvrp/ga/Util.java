@@ -14,9 +14,7 @@ public class Util {
     public static double duration(Customer a, Customer b) {
         float x = a.getX() - b.getX();
         float y = a.getY() - b.getY();
-        x *= x;
-        y *= y;
-        return Math.sqrt(x + y);
+        return Math.sqrt(x*x + y*y);
     }
 
 

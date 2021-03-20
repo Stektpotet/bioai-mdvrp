@@ -1,8 +1,12 @@
 package mdvrp;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import mdvrp.ga.ChromosomeMDVRP;
+import mdvrp.ga.RouteScheduler;
+import mdvrp.structures.Schedule;
+
+import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MDVRPFiles {
     public static MDVRP ReadFile(String filepath) {
@@ -14,8 +18,7 @@ public class MDVRPFiles {
             int numDepots = fileReader.nextInt();
             System.out.println(String.format("%d %d %d", maxVehicles, numCustomers, numDepots));
             fileReader.nextLine();
-
-            MDVRP problem = new MDVRP(maxVehicles, numCustomers, numDepots);
+            MDVRP problem = new MDVRP(file.getName(), maxVehicles, numCustomers, numDepots);
             Map<Integer, Depot> depots = problem.getDepotsMutable();
             Map<Integer, Customer> customers = problem.getCustomersMutable();
 
@@ -56,5 +59,39 @@ public class MDVRPFiles {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void WriteFile(MDVRP problem, ChromosomeMDVRP chromosome, String fileName) {
+        StringBuilder result = new StringBuilder(String.format("%.2f\n", chromosome.fitness()));
+        var solution = chromosome.getSolution(problem);
+
+        var customers = problem.getCustomers();
+        var depots = problem.getDepots();
+
+        int depotNr = 1;    // NOTE: not an ID!
+        for (var gene : solution.entrySet()) {
+            Depot depot = depots.get(gene.getKey());
+            int vehicleNr = 1; // NOTE: not an ID!
+            for (var route : gene.getValue()) {
+                if (route.size() == 0)
+                    continue;
+                var routeStr = String.format("%d\t%d\t%4.2f\t%3d\t\t%s\n", depotNr, vehicleNr,
+                        RouteScheduler.getRouteDuration(depot, route.streamCustomers(customers)),
+                        RouteScheduler.routeDemandSum(route.streamCustomers(customers)),
+                        route.stream().map(String::valueOf).collect(Collectors.joining(" "))
+                        );
+                result.append(routeStr);
+                vehicleNr++;
+            }
+            depotNr++;
+        }
+        System.out.print(result.toString());
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+            writer.write(result.toString());
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

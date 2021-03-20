@@ -218,7 +218,7 @@ public class RouteScheduler {
     static double getScheduleDuration(Depot depot, Stream<Stream<Customer>> customerStreams) {
         return customerStreams.mapToDouble(routeStream -> getRouteDuration(depot, routeStream)).sum();
     }
-    static double getRouteDuration(Depot depot, Stream<Customer> route) {
+    public static double getRouteDuration(Depot depot, Stream<Customer> route) {
         List<Customer> routeCustomers = route.collect(Collectors.toList());
 
         double duration = 0;
