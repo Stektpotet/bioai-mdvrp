@@ -8,8 +8,8 @@ import java.util.Map;
 public class PopulationMDVRP extends ga.data.Population<ChromosomeMDVRP> {
     private Map<Integer, List<Integer>> swappingMap;
 
-    PopulationMDVRP(ChromosomeMDVRP[] individuals, Map<Integer, List<Integer>> swappingMap) {
-        this.individuals = Arrays.asList(individuals);
+    PopulationMDVRP(List<ChromosomeMDVRP> individuals, Map<Integer, List<Integer>> swappingMap) {
+        this.individuals = individuals;
         this.swappingMap = swappingMap;
     }
 

@@ -1,6 +1,7 @@
 package sample;
 
 import ga.data.Initializer;
+import ga.selection.ParentSelector;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -20,7 +21,6 @@ public class Main extends Application {
     MDVRPVisualizer visualizer;
     PopulationMDVRP population;
     MDVRP problem;
-    ShuffleCustomerOrderMutation shuffler;
     // BASED ON THIS
     // https://jvm-gaming.org/t/looking-for-the-simplest-practical-javafx-game-loop/55903
     private class UpdateLoop extends AnimationTimer {
@@ -39,13 +39,20 @@ public class Main extends Application {
 //        launch(args);
         var problem = MDVRPFiles.ReadFile("res/problems/p01");
 
-        Breeder breeder = new Breeder(problem, 0);
+        Breeder breeder = new Breeder(problem, 2);
         PopulationMDVRP pop = breeder.breed(2);
         RecombinatorMDVRP recombinator = new RecombinatorMDVRP(problem);
+        MutatorMDVRP mutator = new MutatorMDVRP(problem, .8f, .8f, .8f, .5f);
+        ParentSelectorMDVRP parentSelector = new ParentSelectorMDVRP(2, 2, 0.8);
+        SurvivorSelectorMDVRP survivorSelector = new SurvivorSelectorMDVRP();
 
         var individuals = pop.getIndividuals();
 
         recombinator.crossover(individuals.get(0), individuals.get(1));
+        GeneticAlgorithm<PopulationMDVRP, ChromosomeMDVRP> geneticAlgorithm = new GeneticAlgorithm<>(breeder,
+                recombinator, mutator, parentSelector, survivorSelector);
+
+        geneticAlgorithm.run(50,  10000);
 
     }
 
@@ -53,7 +60,6 @@ public class Main extends Application {
     public void init() throws Exception {
         if (!initializeProblem())
             return;
-        shuffler = new ShuffleCustomerOrderMutation();
     }
 
     @Override

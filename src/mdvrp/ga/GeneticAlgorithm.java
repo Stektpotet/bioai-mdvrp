@@ -10,20 +10,20 @@ import ga.selection.SurvivorSelector;
 
 import java.util.List;
 
-public class GeneticAlgorithm<C extends Chromosome> {
+public class GeneticAlgorithm<Pop extends Population<C>, C  extends Chromosome> {
 
-    private Initializer<Population<C>, C> initializer;
+    private Initializer<Pop, C> initializer;
     private Recombinator<C> recombinator;
-    private Mutator<C> mutator;
+    private Mutator<Pop, C> mutator;
     private ParentSelector<C> parentSelector;
-    private SurvivorSelector<Population<C>, C> survivorSelector;
+    private SurvivorSelector<Pop, C> survivorSelector;
 
 
-    public GeneticAlgorithm(Initializer<Population<C>, C> initializer,
+    public GeneticAlgorithm(Initializer<Pop, C> initializer,
                             Recombinator<C> recombinator,
-                            Mutator<C> mutator,
+                            Mutator<Pop, C> mutator,
                             ParentSelector<C> parentSelector,
-                            SurvivorSelector<Population<C>, C> survivorSelector) {
+                            SurvivorSelector<Pop, C> survivorSelector) {
 
         this.initializer = initializer;
         this.recombinator = recombinator;
@@ -33,13 +33,15 @@ public class GeneticAlgorithm<C extends Chromosome> {
     }
 
     public C run(int populationSize, int numGenerations) {
-        Population<C> pop = initializer.breed(populationSize);
+        Pop pop = initializer.breed(populationSize);
         for (int i = 0; i < numGenerations; i++) {
             List<C> parents = parentSelector.select(pop);
-            List<C> offspring = mutator.mutateAll(recombinator.recombine(parents));
+            List<C> offspring = mutator.mutateAll(pop, recombinator.recombine(parents));
             pop = survivorSelector.select(pop, parents, offspring);
-            Chromosome currentOptimum = pop.getOptimum();
+            C currentOptimum = pop.getOptimum();
+            System.out.println(currentOptimum.fitness());
         }
+        System.out.println("END");
         return null;
     }
 }

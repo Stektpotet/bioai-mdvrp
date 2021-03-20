@@ -1,6 +1,7 @@
 package mdvrp.ga;
 
 import ga.change.Mutator;
+import ga.data.Population;
 import mdvrp.Depot;
 import mdvrp.MDVRP;
 import mdvrp.structures.CustomerSequence;
@@ -10,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
+public class MutatorMDVRP implements Mutator<PopulationMDVRP, ChromosomeMDVRP> {
     private final MDVRP problem;
     private final float pReversal;
     private final float pReroute;
@@ -26,7 +27,7 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
     }
 
     @Override
-    public ChromosomeMDVRP mutate(ChromosomeMDVRP chromosome) {
+    public ChromosomeMDVRP mutate(PopulationMDVRP population, ChromosomeMDVRP chromosome) {
         Map<Integer, Depot> depots = problem.getDepots();
         // 0. Choose depot
         Depot depot = Util.randomChoice(new ArrayList<>(depots.values()));
@@ -34,7 +35,7 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
 
         if (pInter > Util.random.nextFloat()) {
             // Inter-depot mutation
-            chromosome = interDepotSwapping(chromosome);
+            chromosome = interDepotSwapping(population.getSwappingMap(), chromosome);
         } else {
             // Intra-depot mutations
             chromosome = intraReversal(depot, chromosome);
@@ -136,6 +137,36 @@ public class MutatorMDVRP implements Mutator<ChromosomeMDVRP> {
     }
 
     private ChromosomeMDVRP interDepotSwapping(Map<Integer, List<Integer>> swapMap, ChromosomeMDVRP chromosome) {
-        return null;
+        if (swapMap.size() == 0) {
+            return chromosome;
+        }
+
+        Map<Integer, Schedule> mutateSolution = UtilChromosomeMDVRP.deepCopySolution(chromosome.getSolution(problem));
+        var swap = Util.randomChoice(swapMap.entrySet()); // NOTE: randomChoice on set is slightly expensive!
+        var customerID = swap.getKey();
+        var possibleDepotIdsToMoveInto = new ArrayList<>(swap.getValue());
+        for (var gene : chromosome.getGenes().entrySet())
+        {
+            // if the genekey i.e. the depot id of the gene we're looking at does not occur in the list of possible
+            // depots for this customer to be in, then it's not in this gene the customer occurs - i.e. customerID
+            // cannot be found in this depot's customer assignment.
+            if (!possibleDepotIdsToMoveInto.contains(gene.getKey()))
+                continue;
+            var geneString = gene.getValue();
+            // If the gene is the one with the customer in it.
+            if (geneString.remove(customerID)) {
+                possibleDepotIdsToMoveInto.remove(gene.getKey());
+                break;
+            }
+        }
+
+        var depotId = Util.randomChoice(possibleDepotIdsToMoveInto);
+        var depot = problem.getDepots().get(depotId);
+
+        UtilChromosomeMDVRP.reinsertSingleCustomer(depot, 1., problem.getCustomers(),
+                mutateSolution.get(depotId), customerID, problem.getCustomers().get(customerID)
+        );
+
+        return new ChromosomeMDVRP(mutateSolution);
     }
 }

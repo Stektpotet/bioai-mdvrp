@@ -19,12 +19,18 @@ public class RecombinatorMDVRP implements Recombinator<ChromosomeMDVRP> {
     }
 
     @Override
-    public List<ChromosomeMDVRP> recombine(List<ChromosomeMDVRP> parents) {
-        return null;
+    public List<ChromosomeMDVRP> recombine(final List<ChromosomeMDVRP> parents) {
+        int numOffspring = parents.size();
+        var parentsIter = parents.iterator();
+        List<ChromosomeMDVRP> offspring = new ArrayList<>(numOffspring);
+        for (int i = 0; i < Math.floorDiv(numOffspring, 2); i++) {
+            offspring.addAll(crossover(parentsIter.next(), parentsIter.next()));
+        }
+        return offspring;
     }
 
     @Override
-    public List<ChromosomeMDVRP> crossover(ChromosomeMDVRP mum, ChromosomeMDVRP dad) {
+    public List<ChromosomeMDVRP> crossover(final ChromosomeMDVRP mum, final ChromosomeMDVRP dad) {
         Map<Integer, Schedule> mSolution = mum.getSolution(problem);
         Map<Integer, Schedule> dSolution = dad.getSolution(problem);
 

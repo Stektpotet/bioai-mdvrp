@@ -113,7 +113,7 @@ public class Breeder implements Initializer<PopulationMDVRP, ChromosomeMDVRP> {
 
 
     private PopulationMDVRP actuallyMakeTheChromosomes(int popSize) {
-        ChromosomeMDVRP[] individuals = new ChromosomeMDVRP[popSize];
+        List<ChromosomeMDVRP> individuals = new ArrayList<>(popSize);
         for (int i = 0; i < popSize; i++) {
             // TODO: Potentially optimizable if the swappableMap is empty
             //       Just convert the customerAssignment to ids
@@ -136,7 +136,7 @@ public class Breeder implements Initializer<PopulationMDVRP, ChromosomeMDVRP> {
                 CustomerSequence geneString = new CustomerSequence(entry.getValue());
                 protoChromosome.put(entry.getKey(), geneString);
             }
-            individuals[i] = new ChromosomeMDVRP(protoChromosome, true);
+            individuals.add(new ChromosomeMDVRP(protoChromosome, true));
         }
         return new PopulationMDVRP(individuals, swappingMap);
     }

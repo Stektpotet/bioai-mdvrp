@@ -4,16 +4,18 @@ import ga.data.Population;
 import ga.selection.ParentSelector;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 public class ParentSelectorMDVRP implements ParentSelector<ChromosomeMDVRP> {
 
+    private double selectionPressure = 0.8;
     private int poolSize;
     private int numParents;
 
-    public ParentSelectorMDVRP(int poolSize, int numParents) {
-
+    public ParentSelectorMDVRP(int poolSize, int numParents, double selectionPressure) {
+        this.selectionPressure = selectionPressure;
         this.poolSize = poolSize;
         this.numParents = numParents;
     }
@@ -24,12 +26,13 @@ public class ParentSelectorMDVRP implements ParentSelector<ChromosomeMDVRP> {
         List<ChromosomeMDVRP> individuals = population.getIndividuals();
         List<ChromosomeMDVRP> parents = new ArrayList<>(poolSize);
 
+        Comparator<ChromosomeMDVRP> fitnessComp = (a, b) -> (int) Math.signum(a.fitness() - b.fitness());
         for (int i = 0; i < numParents; i++) {
-            if (Util.random.nextFloat() < 0.8) {
-                Comparator<ChromosomeMDVRP> fitnessComp = (a, b) -> (int) Math.signum(a.fitness() - b.fitness());
-                parents.add(Util.random.ints(poolSize).mapToObj(individuals::get).min(fitnessComp).get());
+            List<ChromosomeMDVRP> pool = Util.randomChoice(individuals, poolSize, false);
+            if (Util.random.nextFloat() < selectionPressure) {
+                parents.add(Collections.min(pool, fitnessComp));
             } else {
-                parents.add(individuals.get(Util.random.nextInt(individuals.size())));
+                parents.add(Util.randomChoice(pool));
             }
         }
         return parents;

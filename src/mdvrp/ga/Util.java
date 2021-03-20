@@ -28,7 +28,6 @@ public class Util {
         return list.get(random.nextInt(list.size()));
     }
 
-<<<<<<< HEAD
     static <T> T randomChoice(Set<T> set) {
         int selectionIndex = random.nextInt(set.size());
         var iter = set.iterator();
@@ -38,11 +37,38 @@ public class Util {
         return iter.next();
     }
 
-
-=======
->>>>>>> 19258bd03983468817e83ed9cb857f84dcaa5e17
     static <T> T randomChoiceRemove(List<T> list) {
         return list.remove(random.nextInt(list.size()));
+    }
+
+    static <T> List<T> randomChoice(final List<T> list, int n, boolean replace) {
+        assert replace || n <= list.size();
+
+        if (replace) {
+            List<T> chosen = new ArrayList<>(n);
+            for (int i = 0; i < n; i++) {
+                chosen.add(list.get(random.nextInt(list.size())));
+            }
+            return chosen;
+        }
+        List<T> chosen = new ArrayList<>(list);
+        Collections.shuffle(chosen, random);
+        return chosen.subList(0, n);
+    }
+
+    public static void main(String[] args) {
+        List<Float> test = new ArrayList<>();
+        test.add(1f);
+        test.add(6f);
+        test.add(7f);
+        test.add(8f);
+        test.add(2f);
+        test.add(3f);
+        test.add(4f);
+        test.add(5f);
+
+        Comparator<Float> fitnessComp = (a, b) -> (int) Math.signum(a - b);
+        System.out.println(Collections.max(test, fitnessComp));
     }
 
     static <T> List<T> randomChoiceNoReplacement(List<T> list, int n) { // TODO: Not nice
@@ -56,6 +82,8 @@ public class Util {
 //    static <K, V> V randomChoice(Map<K, V> map) {
 //        return randomChoice(new ArrayList<>(map.values())); // TODO: Not nice
 //    }
+
+
 
 
     public static <C extends Chromosome> C ArgMin(List<C> arr) {

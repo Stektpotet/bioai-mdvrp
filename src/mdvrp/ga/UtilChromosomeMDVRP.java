@@ -65,7 +65,7 @@ public class UtilChromosomeMDVRP {
         reinsertSingleCustomer(depot, pChooseBestLocation, customers, copy, toReinsertId, customerToReinsert);
     }
 
-    private static void reinsertSingleCustomer(Depot depot, double pChooseBestLocation, Map<Integer, Customer> customers, Schedule copy, Integer toReinsertId, Customer customerToReinsert) {
+    static void reinsertSingleCustomer(Depot depot, double pChooseBestLocation, Map<Integer, Customer> customers, Schedule copy, Integer toReinsertId, Customer customerToReinsert) {
         // Initialisation with zero is necessary for compilation (used only if list is not empty)
         InsertionLocation bestFeasibleLocation = new InsertionLocation(0, 0);
         List<InsertionLocation> feasibleLocations = new ArrayList<>();
