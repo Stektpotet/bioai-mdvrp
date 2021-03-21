@@ -20,10 +20,10 @@ public abstract class Population<ProblemT, C extends Chromosome<ProblemT>> {
     }
 
     public C getOptimum() {
-        float minFitness = individuals.get(0).fitness(problem);
+        double minFitness = individuals.get(0).fitness(problem);
         C fittest = individuals.get(0);
         for (C c : individuals){
-            float currentFitness = c.fitness(problem);
+            double currentFitness = c.fitness(problem);
             if (c.isFeasible(problem) && currentFitness < minFitness) {
                 minFitness = currentFitness;
                 fittest = c;
