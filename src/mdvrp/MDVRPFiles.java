@@ -1,8 +1,7 @@
 package mdvrp;
 
 import mdvrp.ga.ChromosomeMDVRP;
-import mdvrp.ga.RouteScheduler;
-import mdvrp.structures.Schedule;
+import mdvrp.ga.UtilChromosomeMDVRP;
 
 import java.io.*;
 import java.util.*;
@@ -62,7 +61,7 @@ public class MDVRPFiles {
     }
 
     public static void WriteFile(MDVRP problem, ChromosomeMDVRP chromosome, String fileName) {
-        StringBuilder result = new StringBuilder(String.format("%.2f\n", chromosome.fitness()));
+        StringBuilder result = new StringBuilder(String.format("%.2f\n", chromosome.fitness(problem)));
         var solution = chromosome.getSolution(problem);
 
         var customers = problem.getCustomers();
@@ -76,8 +75,8 @@ public class MDVRPFiles {
                 if (route.size() == 0)
                     continue;
                 var routeStr = String.format("%d\t%d\t%4.2f\t%3d\t\t%s\n", depotNr, vehicleNr,
-                        RouteScheduler.getRouteDuration(depot, route.streamCustomers(customers)),
-                        RouteScheduler.routeDemandSum(route.streamCustomers(customers)),
+                        UtilChromosomeMDVRP.routeDuration(depot, route.streamCustomers(customers)),
+                        UtilChromosomeMDVRP.routeDemand(route.streamCustomers(customers)),
                         route.stream().map(String::valueOf).collect(Collectors.joining(" "))
                         );
                 result.append(routeStr);

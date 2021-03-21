@@ -7,11 +7,13 @@ import mdvrp.structures.CustomerSequence;
 import mdvrp.structures.Schedule;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UtilChromosomeMDVRP {
 
-    public static Comparator<ChromosomeMDVRP> chromosomeFitnessComparator() {
-        return (a, b) -> (int) Math.signum(a.fitness() - b.fitness());
+    public static Comparator<ChromosomeMDVRP> chromosomeFitnessComparator(MDVRP problem) {
+        return (a, b) -> (int) Math.signum(a.fitness(problem) - b.fitness(problem));
     }
 
     public static Map<Integer, Schedule> deepCopySolution(Map<Integer, Schedule> original) {
@@ -75,10 +77,10 @@ public class UtilChromosomeMDVRP {
         // for each locations in depotSchedule:
         for (int routeIndex = 0; routeIndex < receiving.size(); routeIndex++) {
             CustomerSequence route = receiving.get(routeIndex);
-            if (!RouteScheduler.isInsertionDemandFeasible(route.streamCustomers(customers), customerToReinsert, depot))
+            if (!isInsertionDemandFeasible(route.streamCustomers(customers), customerToReinsert, depot))
                 continue;
 
-            double duration = RouteScheduler.getRouteDuration(depot, route.streamCustomers(customers));
+            double duration = routeDuration(depot, route.streamCustomers(customers));
             double availableDuration = depot.getMaxDuration() - duration;
 
             if (availableDuration <= 0) {
@@ -127,7 +129,8 @@ public class UtilChromosomeMDVRP {
 //                System.out.println("Everything unfeasible! Selecting random insertion route!");
 
             insertionRoute = Util.randomChoice(receiving);
-            insertionLocationIndex = Util.random.nextInt(insertionRoute.size());
+            int inRouteS = insertionRoute.size();
+            insertionLocationIndex = inRouteS == 0 ? 0 : Util.random.nextInt(inRouteS);
         }
         insertionRoute.add(insertionLocationIndex, toReinsertId);
     }
@@ -149,5 +152,35 @@ public class UtilChromosomeMDVRP {
         int getCustomerIndex() {
             return customerIndex;
         }
+    }
+
+    public static boolean isInsertionDemandFeasible(Stream<Customer> route, Customer insertion, Depot depot) {
+        return routeDemand(route) + insertion.getDemand() <= depot.getMaxVehicleLoad();
+    }
+
+    public static double routeDuration(Depot depot, Stream<Customer> route) {
+        List<Customer> routeCustomers = route.collect(Collectors.toList());
+
+        double duration = 0;
+        Customer position = depot;
+        for (Customer customer : routeCustomers) {
+            duration += Util.duration(position, customer);
+            position = customer;
+        }
+        duration += Util.duration(position, depot);
+
+        return duration;
+    }
+
+    static double scheduleDuration(Depot depot, Stream<Stream<Customer>> customerStreams) {
+        return customerStreams.mapToDouble(routeStream -> routeDuration(depot, routeStream)).sum();
+    }
+
+    public static int routeDemand(Stream<Customer> customerStream) {
+        return customerStream.mapToInt(Customer::getDemand).sum();
+    }
+
+    public static int scheduleDemand(Schedule depotSchedule, Map<Integer, Customer> customers) {
+        return depotSchedule.stream().mapToInt(route -> routeDemand(route.streamCustomers(customers))).sum();
     }
 }

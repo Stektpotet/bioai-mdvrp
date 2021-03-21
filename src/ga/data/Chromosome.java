@@ -1,6 +1,8 @@
 package ga.data;
 
-public interface Chromosome {
-    public float fitness();
-    public boolean isFeasible();
+import mdvrp.MDVRP;
+
+public interface Chromosome<Problem> {
+    public float fitness(Problem problem);
+    public boolean isFeasible(Problem problem);
 }
