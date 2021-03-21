@@ -142,9 +142,6 @@ public class MutatorMDVRP implements Mutator<PopulationMDVRP, ChromosomeMDVRP> {
             // remove it from the gene, it's supposed to be put into another depot
 
             if (depotSchedule.getValue().remove(customerID)) {
-//                System.out.println(chromosome.getSolution(problem).get(depotSchedule.getKey()));
-//                System.out.println(depotSchedule.getValue());
-//                System.out.println(String.format("Removing from depot %d", depotSchedule.getKey()));
                 moveFrom = depotSchedule.getKey();
                 possibleDepotIdsToMoveInto.remove(depotSchedule.getKey());
                 break;
@@ -153,20 +150,10 @@ public class MutatorMDVRP implements Mutator<PopulationMDVRP, ChromosomeMDVRP> {
 
         var depotId = Util.randomChoice(possibleDepotIdsToMoveInto);
         var depot = problem.getDepots().get(depotId);
-//        System.out.println(String.format("Moving into from depot %d", depotId));
-//        System.out.println(String.format("Moving C:%2d from D:%2d into D:%2d", customerID, depotId, moveFrom));
 
-
-
-//        System.out.println(mutateSolution.get(depotId));
         UtilChromosomeMDVRP.reinsertSingleCustomer(depot, 1., problem.getCustomers(),
                 mutateSolution.get(depotId), customerID, problem.getCustomers().get(customerID)
         );
-
-//        System.out.println(mutateSolution.get(depotId));
-
-        //        System.out.println(chromosome.getSolution(problem));
-//        System.out.println(interSwapped.getSolution(problem));
 
         return new ChromosomeMDVRP(mutateSolution);
     }
