@@ -12,7 +12,11 @@ import java.util.stream.Stream;
 
 
 // Chromosome Decoder
+//Klara: I suggest putting scheduling functionality in Chromosome, and other utility in UtilChromosomeMDVRP,
+//       like that we don't have the sketchyness of a package private feasibility-flag-setter.
 public class RouteScheduler {
+
+    private static boolean scheduleFeasible;
 
     public static Map<Integer, Schedule>  scheduleRoutes(ChromosomeMDVRP chromosome, MDVRP problem) {
         Map<Integer, Schedule> routesPerDepot = new HashMap<>();
@@ -31,9 +35,10 @@ public class RouteScheduler {
             // gene.getValue().stream().map(customers::get)
 
             // TODO: Debug if the boolean type actually gets changed!!
-            Boolean scheduleFeasible = true;
+            //      Klara: it doesn't. Very very very bad quickfix (please noooooooooo), but for now: static flag in class.
+            scheduleFeasible = true;
             Schedule schedule = trivialPhase(depot, gene.getValue(), customers, maxVehicleLoad, maxVehicleDuration,
-                    numMaxVehicles, scheduleFeasible);
+                    numMaxVehicles);
             if (!scheduleFeasible)
                 System.out.println("Unfeasible Solution Made!");
             // REMINDER: shiftSchedule will not work properly if given an infeasible schedule, see REMINDER in method!
@@ -140,8 +145,7 @@ public class RouteScheduler {
      */
     //TODO: Use CustomerSequence's customerStream-func
     private static Schedule trivialPhase(Depot depot, CustomerSequence geneString, Map<Integer, Customer> customers,
-                                         int maxVehicleLoad, double maxVehicleDuration, int numMaxVehicles,
-                                         Boolean feasible) {
+                                         int maxVehicleLoad, double maxVehicleDuration, int numMaxVehicles) {
         Schedule schedule = new Schedule();
 
         int currentBase = 0;
@@ -171,7 +175,7 @@ public class RouteScheduler {
         }
 
         if (currentBase < geneString.size()) {
-            feasible = false;
+            scheduleFeasible = false;
             var route = schedule.get(schedule.size() - 1);
             for (; currentBase < geneString.size(); currentBase++) {
                 Integer customerID = geneString.get(currentBase);
@@ -219,6 +223,7 @@ public class RouteScheduler {
     static double getScheduleDuration(Depot depot, Stream<Stream<Customer>> customerStreams) {
         return customerStreams.mapToDouble(routeStream -> getRouteDuration(depot, routeStream)).sum();
     }
+
     public static double getRouteDuration(Depot depot, Stream<Customer> route) {
         List<Customer> routeCustomers = route.collect(Collectors.toList());
 

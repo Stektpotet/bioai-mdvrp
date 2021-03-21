@@ -36,23 +36,27 @@ public class ChromosomeMDVRP implements Chromosome {
             CustomerSequence geneString = entry.getValue().underlyingGeneString();
             genes.put(depotId, geneString);
         }
-        scheduled = false;
     }
 
     Map<Integer, CustomerSequence> getGenes() {
         return Collections.unmodifiableMap(genes);
     }
 
+    // Sketchy - but how do you write sketchy? Scetchy?
     void setFeasible(boolean feasible) {
         this.feasible = feasible;
     }
 
     @Override
     public boolean isFeasible() {
-        assert scheduled;
+        if (!scheduled) {
+            solution = RouteScheduler.scheduleRoutes(this, PROBLEM);
+            scheduled = true;
+        }
         return feasible;
     }
 
+    // Klara: why are we able to give the problem here and not elsewhere? That can be uuuuuuuused!
     public Map<Integer, Schedule> getSolution(MDVRP problem)  {
         if (!scheduled) {
             solution = RouteScheduler.scheduleRoutes(this, problem);
