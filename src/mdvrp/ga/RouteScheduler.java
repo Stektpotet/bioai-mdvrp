@@ -34,7 +34,8 @@ public class RouteScheduler {
             Boolean scheduleFeasible = true;
             Schedule schedule = trivialPhase(depot, gene.getValue(), customers, maxVehicleLoad, maxVehicleDuration,
                     numMaxVehicles, scheduleFeasible);
-
+            if (!scheduleFeasible)
+                System.out.println("Unfeasible Solution Made!");
             // REMINDER: shiftSchedule will not work properly if given an infeasible schedule, see REMINDER in method!
             if (scheduleFeasible) {
                 shiftSchedule(schedule, customers, depot, maxVehicleLoad);

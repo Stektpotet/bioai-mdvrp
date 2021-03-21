@@ -27,7 +27,6 @@ public class GeneticAlgorithmRunner<Pop extends Population<C>, C  extends Chromo
                             Mutator<Pop, C> mutator,
                             ParentSelector<C> parentSelector,
                             SurvivorSelector<Pop, C> survivorSelector, int populationSize, int numGenerations) {
-
         this.initializer = initializer;
         this.recombinator = recombinator;
         this.mutator = mutator;

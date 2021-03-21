@@ -11,6 +11,7 @@ public class SurvivorSelectorMDVRP implements SurvivorSelector<PopulationMDVRP, 
         List<ChromosomeMDVRP> individuals = generation.getIndividuals();
 
         // find best one percent of generation - elite
+        //TODO: Utilize Population.GetOptimum -> Move to UtilChromosomeMDVRP ?
         ChromosomeMDVRP elite = Util.ArgMin(individuals);
 
         // take parents out of generation

@@ -21,7 +21,7 @@ public abstract class Population<C extends Chromosome> {
         C fittest = individuals.get(0);
         for (C c : individuals){
             float currentFitness = c.fitness();
-            if (currentFitness < minFitness) {
+            if (c.isFeasible() && currentFitness < minFitness) {
                 minFitness = currentFitness;
                 fittest = c;
             }

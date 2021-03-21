@@ -57,17 +57,17 @@ public class Main extends Application {
 
         Breeder breeder = new Breeder(problem, 9);
         RecombinatorMDVRP recombinator = new RecombinatorMDVRP(problem);
-        MutatorMDVRP mutator = new MutatorMDVRP(problem, 0.3f, 0.7f, 0.9f, 0.1f);
-        ParentSelectorMDVRP parentSelector = new ParentSelectorMDVRP(2,2, 0.7);
+        MutatorMDVRP mutator = new MutatorMDVRP(problem, 0.7f, 0.7f, 0.7f, 0.1f);
+        ParentSelectorMDVRP parentSelector = new ParentSelectorMDVRP(4,4, 0.7);
         SurvivorSelectorMDVRP survivorSelector = new SurvivorSelectorMDVRP();
 
         var gaListener = new GeneticAlgorithmRunner<>(
-                breeder, recombinator, mutator, parentSelector, survivorSelector, 2, 20000
+                breeder, recombinator, mutator, parentSelector, survivorSelector, 20, 20000
         );
         gaListener.valueProperty().addListener((obs, oldChromosome, newChromosome) -> {
             if (newChromosome != null) {
                 visualizer.clear();
-                visualizer.drawAll(problem, newChromosome.getSolution(problem));
+                visualizer.drawAll(problem, newChromosome);
             }
         });
         gaListener.setOnSucceeded(event -> {

@@ -15,11 +15,11 @@ public class ChromosomeMDVRP implements Chromosome {
 
     public static final MDVRP PROBLEM = MDVRPFiles.ReadFile("res/problems/p01");
 
-    private boolean feasible = true;
-    private Map<Integer, CustomerSequence> genes;
+    private boolean feasible = false;
+    private final Map<Integer, CustomerSequence> genes;
     private boolean scheduled = false;
     private Map<Integer, Schedule> solution;
-    private static final float UNFEASABILITY_FEE = 1000;
+    private static final float UNFEASABILITY_FEE = 100000;
 
     ChromosomeMDVRP(Map<Integer, CustomerSequence> customersPerDepot, boolean shuffle) {
         // https://stackoverflow.com/questions/8559092/create-an-array-of-arraylists
@@ -37,7 +37,6 @@ public class ChromosomeMDVRP implements Chromosome {
             genes.put(depotId, geneString);
         }
         scheduled = false;
-
     }
 
     Map<Integer, CustomerSequence> getGenes() {
@@ -48,7 +47,8 @@ public class ChromosomeMDVRP implements Chromosome {
         this.feasible = feasible;
     }
 
-    boolean getFeasible() {
+    @Override
+    public boolean isFeasible() {
         assert scheduled;
         return feasible;
     }
@@ -64,6 +64,7 @@ public class ChromosomeMDVRP implements Chromosome {
     public float fitness() {
         return fitness(PROBLEM);
     }
+
 
     private float fitness(MDVRP problem) {
 
@@ -85,7 +86,7 @@ public class ChromosomeMDVRP implements Chromosome {
 
         // add feasibility fee
         // TODO: think about "you get what you ask for" - feasibility is more complex than just the flag we have now.
-        if (!this.getFeasible()) {
+        if (!this.isFeasible()) {
             fitness += UNFEASABILITY_FEE;
         }
         return fitness;
