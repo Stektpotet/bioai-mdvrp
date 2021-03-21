@@ -58,9 +58,9 @@ public class Main extends Application {
         Breeder breeder = new Breeder(problem, 10);
         RecombinatorMDVRP recombinator = new RecombinatorMDVRP(problem, 0.6);
         MutatorMDVRP mutator = new MutatorMDVRP(problem, 0.7f, 0.7f, 0.7f, 0.8f);
-        ParentSelectorMDVRP parentSelector = new ParentSelectorMDVRP(10,10, 0.8);
-        SurvivorSelectorMDVRP survivorSelector = new SurvivorSelectorMDVRP();
-        MyPlusLambdaReplacement survivalSelector1 = new MyPlusLambdaReplacement();
+        ParentSelectorMDVRP parentSelector = new ParentSelectorMDVRP(problem, 10,10, 0.8);
+        SurvivorSelectorMDVRP survivorSelector = new SurvivorSelectorMDVRP(problem);
+        MyPlusLambdaReplacement survivalSelector1 = new MyPlusLambdaReplacement(problem);
         var gaListener = new GeneticAlgorithmRunner<>(
                 breeder, recombinator, mutator, parentSelector, survivalSelector1, 200, 20000
         );
@@ -83,8 +83,8 @@ public class Main extends Application {
     }
 
     private boolean initializeProblem() {
-        problem = ChromosomeMDVRP.PROBLEM;
-//        problem = MDVRPFiles.ReadFile("res/problems/p11");
+//        problem = ChromosomeMDVRP.;
+        problem = MDVRPFiles.ReadFile("res/problems/p11");
         return true;
     }
 

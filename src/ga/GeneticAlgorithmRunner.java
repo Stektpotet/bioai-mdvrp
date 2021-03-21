@@ -12,21 +12,21 @@ import javafx.concurrent.Task;
 
 import java.util.List;
 
-public class GeneticAlgorithmRunner<Pop extends Population<C>, C  extends Chromosome> extends Service<GeneticAlgorithmSnapshot<C>> {
+public class GeneticAlgorithmRunner<ProblemT, Pop extends Population<ProblemT, C>, C  extends Chromosome<ProblemT>> extends Service<GeneticAlgorithmSnapshot<C>> {
 
-    private Initializer<Pop, C> initializer;
+    private Initializer<ProblemT, Pop, C> initializer;
     private Recombinator<C> recombinator;
-    private Mutator<Pop, C> mutator;
-    private ParentSelector<C> parentSelector;
-    private SurvivorSelector<Pop, C> survivorSelector;
+    private Mutator<ProblemT, Pop, C> mutator;
+    private ParentSelector<ProblemT, C> parentSelector;
+    private SurvivorSelector<ProblemT, Pop, C> survivorSelector;
     private final int populationSize;
     private final int numGenerations;
 
-    public GeneticAlgorithmRunner(Initializer<Pop, C> initializer,
+    public GeneticAlgorithmRunner(Initializer<ProblemT, Pop, C> initializer,
                             Recombinator<C> recombinator,
-                            Mutator<Pop, C> mutator,
-                            ParentSelector<C> parentSelector,
-                            SurvivorSelector<Pop, C> survivorSelector, int populationSize, int numGenerations) {
+                            Mutator<ProblemT, Pop, C> mutator,
+                            ParentSelector<ProblemT, C> parentSelector,
+                            SurvivorSelector<ProblemT, Pop, C> survivorSelector, int populationSize, int numGenerations) {
         this.initializer = initializer;
         this.recombinator = recombinator;
         this.mutator = mutator;

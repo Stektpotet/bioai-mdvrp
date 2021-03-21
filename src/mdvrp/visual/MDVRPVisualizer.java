@@ -33,8 +33,8 @@ public class MDVRPVisualizer {
         public Color depotColor = Color.valueOf("f16");
         public Color customerColor = Color.valueOf("3ddb0d");
         public Color customerColorMaxDemand = Color.valueOf("750505");
-        public double customerSize = 0.7;
-        public double depotSize = 1;
+        public double customerSize = 2;
+        public double depotSize = 2;
     }
 
     private double width, height;
@@ -76,14 +76,14 @@ public class MDVRPVisualizer {
         Map<Integer, Schedule> solution = snapshot.optimum.getSolution(problem);
         drawRoutes(solution, problem.getCustomers(), problem.getDepots());
         drawProblemExtraInfo(solution, problem);
-        drawInfo(snapshot.optimum, snapshot.currentGeneration);
+        drawInfo(snapshot.optimum, snapshot.currentGeneration, problem);
     }
-    public void drawInfo(ChromosomeMDVRP chromosome, int gen) {
+    public void drawInfo(ChromosomeMDVRP chromosome, int gen, MDVRP problem) {
         graphics.setStroke(Color.WHITE);
         graphics.setLineWidth(0.1);
 
         //TODO: Sensible positioning and scaling of text based on the problem bounds
-        graphics.strokeText(String.format("Cost: %4.2f", chromosome.fitness()), bounds.getMinX(), bounds.getMaxY() - 1);
+        graphics.strokeText(String.format("Cost: %4.2f", chromosome.fitness(problem)), bounds.getMinX(), bounds.getMaxY() - 1);
         graphics.strokeText(String.format("Gen #%4d", gen), bounds.getMinX(), bounds.getMaxY() - 5);
     }
 
