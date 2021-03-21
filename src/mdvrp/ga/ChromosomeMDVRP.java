@@ -13,11 +13,14 @@ import java.util.stream.Stream;
 
 public class ChromosomeMDVRP implements Chromosome<MDVRP> {
 
-    private boolean feasible = false;
     private final Map<Integer, CustomerSequence> genes;
     private boolean scheduled = false;
     private Map<Integer, Schedule> solution;
-    private static final float UNFEASABILITY_FEE = 100000;
+    private double unfeasibilityFee = 0;
+
+    // duration: add unfeasible duration to fitness
+    // demand: add unfeasible demand to fitness? (eventually scale according to something)
+    // fee for overall demand of depot infeasible not depending on order? Or just make mutation and crossover smarter?
 
     ChromosomeMDVRP(Map<Integer, CustomerSequence> customersPerDepot, boolean shuffle) {
         // https://stackoverflow.com/questions/8559092/create-an-array-of-arraylists
@@ -42,26 +45,26 @@ public class ChromosomeMDVRP implements Chromosome<MDVRP> {
 
     public boolean isFeasible(MDVRP problem) {
         if (!scheduled) {
-            solution = scheduleRoutes(problem);
+            solution = schedule(problem);
             scheduled = true;
         }
-        return feasible;
+        return unfeasibilityFee > 0;
     }
 
     // Klara: why are we able to give the problem here and not elsewhere? That can be uuuuuuuused!
     public Map<Integer, Schedule> getSolution(MDVRP problem)  {
         if (!scheduled) {
-            solution = scheduleRoutes(problem);
+            solution = schedule(problem);
             scheduled = true;
         }
         return Collections.unmodifiableMap(solution);
     }
 
-    public float fitness(MDVRP problem) {
+    public double fitness(MDVRP problem) {
 
         getSolution(problem);
 
-        float fitness = 0;
+        double fitness = 0;
         // loop over depots - routes - customers and add distance
         for (var routesPerDepot : solution.entrySet()) {
             Customer depot = problem.getDepots().get(routesPerDepot.getKey());
@@ -74,13 +77,7 @@ public class ChromosomeMDVRP implements Chromosome<MDVRP> {
                 fitness += Util.duration(position, depot); // end route at depot
             }
         }
-
-        // add feasibility fee
-        // TODO: think about "you get what you ask for" - feasibility is more complex than just the flag we have now.
-        if (!this.isFeasible(problem)) {
-            fitness += UNFEASABILITY_FEE;
-        }
-        return fitness;
+        return fitness + unfeasibilityFee;
     }
 
     @Override
@@ -90,12 +87,12 @@ public class ChromosomeMDVRP implements Chromosome<MDVRP> {
         ).collect(Collectors.joining());
     }
 
-    public Map<Integer, Schedule>  scheduleRoutes(MDVRP problem) {
+    public Map<Integer, Schedule> schedule(MDVRP problem) {
         Map<Integer, Schedule> routesPerDepot = new HashMap<>();
 
         Map<Integer, Depot> depots = problem.getDepots();
         Map<Integer, Customer> customers = problem.getCustomers();
-        feasible = true;
+        unfeasibilityFee = 0;
         for (Map.Entry<Integer, CustomerSequence> gene : this.getGenes().entrySet()) {
 
             Depot depot = depots.get(gene.getKey());
@@ -103,7 +100,6 @@ public class ChromosomeMDVRP implements Chromosome<MDVRP> {
             double maxVehicleDuration = depot.getMaxDuration();
             int numMaxVehicles = problem.getNumMaxVehicles();
 
-            feasible = true;
             Schedule schedule = scheduleRoute(depot, gene.getValue(), customers, maxVehicleLoad, maxVehicleDuration,
                     numMaxVehicles);
             routesPerDepot.put(depot.getId(), schedule);
@@ -123,6 +119,11 @@ public class ChromosomeMDVRP implements Chromosome<MDVRP> {
     //TODO: Use CustomerSequence's customerStream-func
     private Schedule scheduleRoute(Depot depot, CustomerSequence geneString, Map<Integer, Customer> customers,
                                    int maxVehicleLoad, double maxVehicleDuration, int numMaxVehicles) {
+
+        if (UtilChromosomeMDVRP.geneStringDemand(geneString, customers) > maxVehicleLoad * numMaxVehicles) {
+            // TODO think about reasonable value for this
+            unfeasibilityFee += 50;
+        }
         Schedule schedule = new Schedule();
 
         int currentBase = 0;
@@ -151,13 +152,30 @@ public class ChromosomeMDVRP implements Chromosome<MDVRP> {
             schedule.add(route);
         }
 
+        //TODO make an iterator
         if (currentBase < geneString.size()) {
-            feasible = false;
-            var route = schedule.get(schedule.size() - 1);
-            for (; currentBase < geneString.size(); currentBase++) {
-                Integer customerID = geneString.get(currentBase);
-                route.add(customerID);
+            CustomerSequence lastRoute = schedule.get(schedule.size() - 1);
+
+            double unfeasibleDistance = 0;
+            int unfeasibleDemand = 0;
+            Customer position = customers.get(geneString.get(currentBase - 1));
+            for (int i = currentBase; i < geneString.size(); i++) {
+                Integer customerId = geneString.get(i);
+                Customer next = customers.get(customerId);
+
+                // add unfeasible customers to last route
+                lastRoute.add(customerId);
+
+                // accumulating distance and demand of infeasible customers
+                unfeasibleDistance += Util.duration(position, next);
+                unfeasibleDemand += next.getDemand();
+
+                position = next;
             }
+            unfeasibleDistance += Util.duration(position, depot);
+
+            //TODO weight demand and distance fee
+            unfeasibilityFee += unfeasibleDemand + unfeasibleDistance;
         } else {
             // REMINDER: shiftSchedule will not work properly if given an infeasible schedule, see REMINDER in method!
             shiftSchedule(schedule, customers, depot, maxVehicleLoad);

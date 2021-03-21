@@ -183,4 +183,8 @@ public class UtilChromosomeMDVRP {
     public static int scheduleDemand(Schedule depotSchedule, Map<Integer, Customer> customers) {
         return depotSchedule.stream().mapToInt(route -> routeDemand(route.streamCustomers(customers))).sum();
     }
+
+    public static int geneStringDemand(CustomerSequence geneString, Map<Integer, Customer> customers) {
+        return geneString.streamCustomers(customers).mapToInt(Customer::getDemand).sum();
+    }
 }
