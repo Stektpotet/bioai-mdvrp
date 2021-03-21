@@ -1,6 +1,7 @@
 package mdvrp.visual;
 
 import ga.GeneticAlgorithmSnapshot;
+import javafx.animation.FillTransition;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
@@ -19,16 +20,19 @@ import mdvrp.ga.ChromosomeMDVRP;
 import mdvrp.ga.Util;
 import mdvrp.structures.Schedule;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 public class MDVRPVisualizer {
     private class DrawOptions {
         public Color[] colorCycle = {Color.GREEN, Color.FIREBRICK, Color.YELLOW, Color.DARKCYAN,
-                Color.DARKSALMON, Color.PEACHPUFF, Color.AQUA, Color.MAROON};
+                Color.DARKSALMON, Color.PEACHPUFF, Color.AQUA, Color.MAROON, Color.DARKKHAKI, Color.ROSYBROWN};
         public Color backgroundColor = Color.valueOf("2a2e2e");
         public Color depotColor = Color.valueOf("f16");
-        public Color customerColor = Color.valueOf("5ad");
+        public Color customerColor = Color.valueOf("3ddb0d");
+        public Color customerColorMaxDemand = Color.valueOf("750505");
         public double customerSize = 0.7;
         public double depotSize = 1;
     }
@@ -69,8 +73,9 @@ public class MDVRPVisualizer {
     }
     public void drawAll(MDVRP problem, GeneticAlgorithmSnapshot<ChromosomeMDVRP> snapshot) {
         clear();
-        drawRoutes(snapshot.optimum.getSolution(problem), problem.getCustomers(), problem.getDepots());
-        drawProblem(problem);
+        Map<Integer, Schedule> solution = snapshot.optimum.getSolution(problem);
+        drawRoutes(solution, problem.getCustomers(), problem.getDepots());
+        drawProblemExtraInfo(solution, problem);
         drawInfo(snapshot.optimum, snapshot.currentGeneration);
     }
     public void drawInfo(ChromosomeMDVRP chromosome, int gen) {
@@ -111,25 +116,56 @@ public class MDVRPVisualizer {
         return new BoundingBox(minX, minY, maxX - minX, maxY - minY);
     }
 
-    public void drawProblem(MDVRP problem) {
-        graphics.setFill(options.customerColor);
-        for (var customer : problem.getCustomers().values()) {
-            graphics.fillOval(
-                    customer.getX() - options.customerSize * .5,
-                    customer.getY() - options.customerSize * .5,
-                    options.customerSize, options.customerSize);
+    public void drawProblemExtraInfo(Map<Integer, Schedule> solution, MDVRP problem) {
+        drawCustomersDemandColoring(solution, problem);
+        drawDepots(problem.getDepots());
+    }
+
+    private void drawCustomersDemandColoring(Map<Integer, Schedule> solution, MDVRP problem) {
+        Map<Integer, Depot> depots = problem.getDepots();
+        Map<Integer, Customer> customers = problem.getCustomers();
+        double highestDemand = customers.values().stream().mapToInt(Customer::getDemand).max().orElse(1);
+        for (var routesPerDepot : solution.entrySet()) {
+            Depot depot = depots.get(routesPerDepot.getKey());
+            for (var route : routesPerDepot.getValue()) {
+                for (var nextCustomerID : route) {
+                    Customer customer = customers.get(nextCustomerID);
+                    graphics.setFill(options.customerColor.interpolate(options.customerColorMaxDemand, customer.getDemand() / highestDemand));
+                    graphics.fillOval(
+                            customer.getX() - options.customerSize * .5,
+                            customer.getY() - options.customerSize * .5,
+                            options.customerSize, options.customerSize);
+                }
+            }
         }
-        graphics.setFill(options.depotColor);
-        for (var depot : problem.getDepots().values()) {
-            graphics.fillRect(
+    }
+
+    public void drawProblem(MDVRP problem) {
+        drawCustomers(problem.getCustomers());
+        drawDepots(problem.getDepots());
+    }
+    private void drawCustomers(Map<Integer, Customer> customers) {
+        graphics.setFill(options.customerColor);
+        for (var depot : customers.values()) {
+            graphics.fillOval(
                     depot.getX() - options.customerSize * .5,
                     depot.getY() - options.customerSize * .5,
+                    options.customerSize, options.customerSize);
+        }
+    }
+
+    private void drawDepots(Map<Integer, Depot> depots) {
+        graphics.setFill(options.depotColor);
+        for (var depot : depots.values()) {
+            graphics.fillRect(
+                    depot.getX() - options.depotSize * .5,
+                    depot.getY() - options.depotSize * .5,
                     options.depotSize, options.depotSize);
             graphics.setStroke(Color.WHITE);
             graphics.setLineWidth(0.1);
             graphics.strokeText(String.valueOf(depot.getId()),
-                    depot.getX() - options.customerSize * .5,
-                    depot.getY() - options.customerSize * .5 + options.depotSize, options.depotSize);
+                    depot.getX() - options.depotSize * .5,
+                    depot.getY() - options.depotSize * .5 + options.depotSize, options.depotSize);
         }
     }
 
