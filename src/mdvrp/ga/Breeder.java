@@ -9,10 +9,10 @@ import mdvrp.structures.CustomerSequence;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Breeder implements Initializer<PopulationMDVRP, ChromosomeMDVRP> {
+public class Breeder implements Initializer<MDVRP, PopulationMDVRP, ChromosomeMDVRP> {
 
-    private MDVRP problem;
-    private float swappingDistance;
+    private final MDVRP problem;
+    private final float swappingDistance;
     private Map<Integer, List<Integer>> fixedAssignment;
     private Map<Integer, List<Integer>> swappingMap;
 
@@ -138,6 +138,6 @@ public class Breeder implements Initializer<PopulationMDVRP, ChromosomeMDVRP> {
             }
             individuals.add(new ChromosomeMDVRP(protoChromosome, true));
         }
-        return new PopulationMDVRP(individuals, swappingMap);
+        return new PopulationMDVRP(problem, individuals, swappingMap);
     }
 }

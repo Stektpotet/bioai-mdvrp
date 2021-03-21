@@ -82,22 +82,7 @@ public class Util {
 //    }
 
 
-
-
-    public static <C extends Chromosome> C ArgMin(List<C> arr) {
-        float minFitness = arr.get(0).fitness();
-        C fittest = arr.get(0);
-        for (C c : arr){
-            float currentFitness = c.fitness();
-            if (currentFitness < minFitness) {
-                minFitness = currentFitness;
-                fittest = c;
-            }
-        }
-        return fittest;
-    }
-
-    private static boolean isAssignmentCapacityValid(Map<Depot, List<Customer>> assignment, int numVehicles) {
+    /*private static boolean isAssignmentCapacityValid(Map<Depot, List<Customer>> assignment, int numVehicles) {
         int i = 0;
         for (var gene : assignment.entrySet()) {
             int depotRoutesSum = gene.getValue().stream().mapToInt(Customer::getDemand).sum();
@@ -106,6 +91,6 @@ public class Util {
                 return false;
         }
         return true;
-    }
+    }*/
 
 }

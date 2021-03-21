@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class MutatorMDVRP implements Mutator<PopulationMDVRP, ChromosomeMDVRP> {
+public class MutatorMDVRP implements Mutator<MDVRP, PopulationMDVRP, ChromosomeMDVRP> {
     private final MDVRP problem;
     private final float pReversal;
     private final float pReroute;

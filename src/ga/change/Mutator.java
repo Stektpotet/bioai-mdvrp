@@ -6,7 +6,7 @@ import ga.data.Population;
 import java.util.ArrayList;
 import java.util.List;
 
-public interface Mutator<P extends Population<C>, C extends Chromosome> {
+public interface Mutator<ProblemT, P extends Population<ProblemT, C>, C extends Chromosome<ProblemT>> {
     public default List<C> mutateAll(P population, List<C> chromosomes) {
         List<C> mutated = new ArrayList<>(chromosomes.size());
         for (C c : chromosomes) {
