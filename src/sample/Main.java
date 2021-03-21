@@ -57,7 +57,7 @@ public class Main extends Application {
 
         Breeder breeder = new Breeder(problem, 9);
         RecombinatorMDVRP recombinator = new RecombinatorMDVRP(problem);
-        MutatorMDVRP mutator = new MutatorMDVRP(problem, 0.3f, 0.7f, 0.9f, 1.0f);
+        MutatorMDVRP mutator = new MutatorMDVRP(problem, 0.3f, 0.7f, 0.9f, 0.1f);
         ParentSelectorMDVRP parentSelector = new ParentSelectorMDVRP(2,2, 0.7);
         SurvivorSelectorMDVRP survivorSelector = new SurvivorSelectorMDVRP();
 
@@ -75,7 +75,7 @@ public class Main extends Application {
         });
         gaListener.start();
 
-//        new UpdateLoop().start();
+//        new UpdateLoop().start();d
         primaryStage.show();
     }
 

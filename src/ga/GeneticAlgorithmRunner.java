@@ -47,7 +47,9 @@ public class GeneticAlgorithmRunner<Pop extends Population<C>, C  extends Chromo
                     List<C> parents = parentSelector.select(pop);
                     List<C> offspring = mutator.mutateAll(pop, recombinator.recombine(parents));
                     pop = survivorSelector.select(pop, parents, offspring);
-                    updateValue(pop.getOptimum());
+                    C optimum = pop.getOptimum();
+                    updateValue(optimum);
+
                 }
                 return pop.getOptimum();
             }

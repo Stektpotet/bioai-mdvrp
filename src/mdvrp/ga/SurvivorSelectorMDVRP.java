@@ -19,9 +19,7 @@ public class SurvivorSelectorMDVRP implements SurvivorSelector<PopulationMDVRP, 
         }
 
         // put offspring into generation
-        for (var o : offspring) {
-            individuals.add(o);
-        }
+        individuals.addAll(offspring);
 
         // randomly pop one percent of generation - r
         ChromosomeMDVRP randomlyChosen = individuals.remove(Util.random.nextInt(individuals.size()));

@@ -22,7 +22,7 @@ public class Depot extends Customer {
 
     @Override
     public String toString() {
-        return String.format("Depot(%4d\t%4d, %s)",
+        return String.format("Depot(%4f\t%4d, %s)",
                 maxDuration, maxVehicleLoad, super.toString());
     }
 }

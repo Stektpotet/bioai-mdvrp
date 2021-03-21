@@ -45,6 +45,6 @@ public class Customer {
 
     @Override
     public String toString() {
-        return String.format("Customer(%4d\t%4d\t%4d\t%4d\t%4d)", id, x, y, duration, demand);
+        return String.format("Customer(%4d\t%4d\t%4d\t%4f\t%4d)", id, x, y, duration, demand);
     }
 }

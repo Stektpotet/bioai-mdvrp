@@ -10,13 +10,13 @@ import java.util.stream.Collectors;
 
 public class MDVRPFiles {
     public static MDVRP ReadFile(String filepath) {
+        System.out.println(String.format("Reading \"%s\"...", filepath));
         try {
             File file = new File(filepath);
             Scanner fileReader = new Scanner(file);
             int maxVehicles = fileReader.nextInt();
             int numCustomers = fileReader.nextInt();
             int numDepots = fileReader.nextInt();
-            System.out.println(String.format("%d %d %d", maxVehicles, numCustomers, numDepots));
             fileReader.nextLine();
             MDVRP problem = new MDVRP(file.getName(), maxVehicles, numCustomers, numDepots);
             Map<Integer, Depot> depots = problem.getDepotsMutable();

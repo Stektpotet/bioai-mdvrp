@@ -91,4 +91,10 @@ public class ChromosomeMDVRP implements Chromosome {
         return fitness;
     }
 
+    @Override
+    public String toString() {
+        return genes.entrySet().stream().map(g -> g.getValue().stream().map(String::valueOf).collect(
+                Collectors.joining(" ", String.format("%d ", g.getKey()), "| "))
+        ).collect(Collectors.joining());
+    }
 }
