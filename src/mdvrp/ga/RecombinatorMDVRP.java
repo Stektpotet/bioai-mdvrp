@@ -12,20 +12,28 @@ import java.util.Map;
 
 public class RecombinatorMDVRP implements Recombinator<ChromosomeMDVRP> {
 
-    private MDVRP problem;
+    private final MDVRP problem;
+    private final double pCrossover;
 
-    public RecombinatorMDVRP(MDVRP problem) {
+    public RecombinatorMDVRP(MDVRP problem, double pCrossover) {
         this.problem = problem;
+        this.pCrossover = pCrossover;
     }
 
-    // TODO: add recombination probability
     @Override
     public List<ChromosomeMDVRP> recombine(final List<ChromosomeMDVRP> parents) {
         int numOffspring = parents.size();
         var parentsIter = parents.iterator();
         List<ChromosomeMDVRP> offspring = new ArrayList<>(numOffspring);
         for (int i = 0; i < Math.floorDiv(numOffspring, 2); i++) {
-            offspring.addAll(crossover(parentsIter.next(), parentsIter.next()));
+            ChromosomeMDVRP mum = parentsIter.next();
+            ChromosomeMDVRP dad = parentsIter.next();
+            if (Util.random.nextFloat() < pCrossover) {
+                offspring.addAll(crossover(mum, dad));
+            } else {
+                offspring.add(mum);
+                offspring.add(dad);
+            }
         }
         return offspring;
     }

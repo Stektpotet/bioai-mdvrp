@@ -10,9 +10,9 @@ import java.util.List;
 
 public class ParentSelectorMDVRP implements ParentSelector<ChromosomeMDVRP> {
 
-    private double selectionPressure = 0.8;
-    private int poolSize;
-    private int numParents;
+    private final double selectionPressure;
+    private final int poolSize;
+    private final int numParents;
 
     public ParentSelectorMDVRP(int poolSize, int numParents, double selectionPressure) {
         this.selectionPressure = selectionPressure;
