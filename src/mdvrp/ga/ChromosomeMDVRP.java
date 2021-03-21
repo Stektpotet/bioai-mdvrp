@@ -48,7 +48,7 @@ public class ChromosomeMDVRP implements Chromosome<MDVRP> {
             solution = schedule(problem);
             scheduled = true;
         }
-        return unfeasibilityFee > 0;
+        return unfeasibilityFee == 0;
     }
 
     // Klara: why are we able to give the problem here and not elsewhere? That can be uuuuuuuused!
