@@ -14,6 +14,7 @@ import javafx.scene.transform.Transform;
 import mdvrp.Customer;
 import mdvrp.Depot;
 import mdvrp.MDVRP;
+import mdvrp.ga.ChromosomeMDVRP;
 import mdvrp.ga.Util;
 import mdvrp.structures.Schedule;
 
@@ -64,12 +65,17 @@ public class MDVRPVisualizer {
         graphics.setFill(options.backgroundColor);
         graphics.fillRect(bounds.getMinX()-10, bounds.getMinY()-10, bounds.getWidth()+20, bounds.getHeight()+20);
     }
-    public void drawAll(MDVRP problem, Map<Integer, Schedule> schedule) {
+    public void drawAll(MDVRP problem, ChromosomeMDVRP chromosome) {
         clear();
-        drawRoutes(schedule, problem.getCustomers(), problem.getDepots());
+        drawRoutes(chromosome.getSolution(problem), problem.getCustomers(), problem.getDepots());
         drawProblem(problem);
+        drawInfo(chromosome);
     }
-
+    public void drawInfo(ChromosomeMDVRP chromosome) {
+        graphics.setStroke(Color.WHITE);
+        graphics.setLineWidth(0.1);
+        graphics.strokeText(String.format("Cost: %4.2f", chromosome.fitness()), bounds.getMinX(), bounds.getMaxY() - 1);
+    }
     private BoundingBox calculateProblemBounds(MDVRP problem) {
         int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
         for (var customer : problem.getCustomers().values()) {
