@@ -1,0 +1,18 @@
+package mdvrp.ga;
+
+import ga.data.Population;
+import ga.selection.SurvivorSelector;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MyPlusLambdaReplacement implements SurvivorSelector<PopulationMDVRP, ChromosomeMDVRP> {
+
+    @Override
+    public PopulationMDVRP select(PopulationMDVRP generation, List<ChromosomeMDVRP> parents, List<ChromosomeMDVRP> offspring) {
+        List<ChromosomeMDVRP> myPlusLa = new ArrayList<>(generation.getIndividuals());
+        myPlusLa.addAll(offspring);
+        myPlusLa.sort(UtilChromosomeMDVRP.chromosomeFitnessComparator());
+        return new PopulationMDVRP(myPlusLa.subList(0, generation.getSize()), generation.getSwappingMap());
+    }
+}

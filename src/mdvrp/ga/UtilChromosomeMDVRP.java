@@ -6,12 +6,13 @@ import mdvrp.MDVRP;
 import mdvrp.structures.CustomerSequence;
 import mdvrp.structures.Schedule;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UtilChromosomeMDVRP {
+
+    public static Comparator<ChromosomeMDVRP> chromosomeFitnessComparator() {
+        return (a, b) -> (int) Math.signum(a.fitness() - b.fitness());
+    }
 
     public static Map<Integer, Schedule> deepCopySolution(Map<Integer, Schedule> original) {
         Map<Integer, Schedule> copy = new HashMap<>();

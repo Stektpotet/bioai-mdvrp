@@ -26,7 +26,7 @@ public class ParentSelectorMDVRP implements ParentSelector<ChromosomeMDVRP> {
         List<ChromosomeMDVRP> individuals = population.getIndividuals();
         List<ChromosomeMDVRP> parents = new ArrayList<>(poolSize);
 
-        Comparator<ChromosomeMDVRP> fitnessComp = (a, b) -> (int) Math.signum(a.fitness() - b.fitness());
+        Comparator<ChromosomeMDVRP> fitnessComp = UtilChromosomeMDVRP.chromosomeFitnessComparator();
         for (int i = 0; i < numParents; i++) {
             List<ChromosomeMDVRP> pool = Util.randomChoice(individuals, poolSize, false);
             if (Util.random.nextFloat() < selectionPressure) {
