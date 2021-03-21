@@ -12,7 +12,7 @@ import javafx.concurrent.Task;
 
 import java.util.List;
 
-public class GeneticAlgorithmRunner<Pop extends Population<C>, C  extends Chromosome> extends Service<C> {
+public class GeneticAlgorithmRunner<Pop extends Population<C>, C  extends Chromosome> extends Service<GeneticAlgorithmSnapshot<C>> {
 
     private Initializer<Pop, C> initializer;
     private Recombinator<C> recombinator;
@@ -37,20 +37,20 @@ public class GeneticAlgorithmRunner<Pop extends Population<C>, C  extends Chromo
     }
 
     @Override
-    protected Task<C> createTask() {
-        return new Task<C>() {
+    protected Task<GeneticAlgorithmSnapshot<C>> createTask() {
+        return new Task<>() {
             @Override
-            protected C call() throws Exception {
+            protected GeneticAlgorithmSnapshot<C> call() throws Exception {
                 Pop pop = initializer.breed(populationSize);
                 for (int i = 0; i < numGenerations; i++) {
                     List<C> parents = parentSelector.select(pop);
                     List<C> offspring = mutator.mutateAll(pop, recombinator.recombine(parents));
                     pop = survivorSelector.select(pop, parents, offspring);
                     C optimum = pop.getOptimum();
-                    updateValue(optimum);
-
+                    updateValue(new GeneticAlgorithmSnapshot<>(i, optimum));
+                    updateProgress(i, numGenerations);
                 }
-                return pop.getOptimum();
+                return new GeneticAlgorithmSnapshot<>(numGenerations, pop.getOptimum());
             }
         };
     }

@@ -1,5 +1,6 @@
 package mdvrp.visual;
 
+import ga.GeneticAlgorithmSnapshot;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
@@ -44,7 +45,6 @@ public class MDVRPVisualizer {
         options = new DrawOptions();
         width = graphics.getCanvas().getWidth();
         height = graphics.getCanvas().getHeight();
-        graphics.setFont(new Font(graphics.getFont().getName(), 1));
     }
     public void calibrateVisualizer(MDVRP problem) {
         Canvas canvas = graphics.getCanvas();
@@ -59,23 +59,29 @@ public class MDVRPVisualizer {
                 -bounds.getMinX() + (largestAxis - bounds.getWidth()) / 2,
                 -bounds.getMinY() + (largestAxis - bounds.getHeight()) / 2);
         graphics.setTransform(transform);
+
+        graphics.setFont(new Font(graphics.getFont().getName(), 4));
     }
 
     public void clear() {
         graphics.setFill(options.backgroundColor);
         graphics.fillRect(bounds.getMinX()-10, bounds.getMinY()-10, bounds.getWidth()+20, bounds.getHeight()+20);
     }
-    public void drawAll(MDVRP problem, ChromosomeMDVRP chromosome) {
+    public void drawAll(MDVRP problem, GeneticAlgorithmSnapshot<ChromosomeMDVRP> snapshot) {
         clear();
-        drawRoutes(chromosome.getSolution(problem), problem.getCustomers(), problem.getDepots());
+        drawRoutes(snapshot.optimum.getSolution(problem), problem.getCustomers(), problem.getDepots());
         drawProblem(problem);
-        drawInfo(chromosome);
+        drawInfo(snapshot.optimum, snapshot.currentGeneration);
     }
-    public void drawInfo(ChromosomeMDVRP chromosome) {
+    public void drawInfo(ChromosomeMDVRP chromosome, int gen) {
         graphics.setStroke(Color.WHITE);
         graphics.setLineWidth(0.1);
+
+        //TODO: Sensible positioning and scaling of text based on the problem bounds
         graphics.strokeText(String.format("Cost: %4.2f", chromosome.fitness()), bounds.getMinX(), bounds.getMaxY() - 1);
+        graphics.strokeText(String.format("Gen #%4d", gen), bounds.getMinX(), bounds.getMaxY() - 5);
     }
+
     private BoundingBox calculateProblemBounds(MDVRP problem) {
         int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
         for (var customer : problem.getCustomers().values()) {

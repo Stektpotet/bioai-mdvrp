@@ -55,23 +55,26 @@ public class Main extends Application {
         visualizer = new MDVRPVisualizer(canvas.getGraphicsContext2D());
         visualizer.calibrateVisualizer(problem);
 
-        Breeder breeder = new Breeder(problem, 9);
-        RecombinatorMDVRP recombinator = new RecombinatorMDVRP(problem);
-        MutatorMDVRP mutator = new MutatorMDVRP(problem, 0.7f, 0.7f, 0.7f, 0.1f);
-        ParentSelectorMDVRP parentSelector = new ParentSelectorMDVRP(4,4, 0.7);
+        Breeder breeder = new Breeder(problem, 10);
+        RecombinatorMDVRP recombinator = new RecombinatorMDVRP(problem, 0.6);
+        MutatorMDVRP mutator = new MutatorMDVRP(problem, 0.7f, 0.7f, 0.7f, 0.8f);
+        ParentSelectorMDVRP parentSelector = new ParentSelectorMDVRP(10,10, 0.8);
         SurvivorSelectorMDVRP survivorSelector = new SurvivorSelectorMDVRP();
-
+        MyPlusLambdaReplacement survivalSelector1 = new MyPlusLambdaReplacement();
         var gaListener = new GeneticAlgorithmRunner<>(
-                breeder, recombinator, mutator, parentSelector, survivorSelector, 20, 20000
+                breeder, recombinator, mutator, parentSelector, survivalSelector1, 200, 20000
         );
-        gaListener.valueProperty().addListener((obs, oldChromosome, newChromosome) -> {
-            if (newChromosome != null) {
+        gaListener.valueProperty().addListener((obs, prevSnapshot, newSnapshot) -> {
+            if (newSnapshot != null) {
                 visualizer.clear();
-                visualizer.drawAll(problem, newChromosome);
+                visualizer.drawAll(problem, newSnapshot);
             }
         });
+        gaListener.progressProperty().addListener((obs, oldProgress, newProgress) -> {
+        });
+        //TODO: On cancel write to file current optimum
         gaListener.setOnSucceeded(event -> {
-            MDVRPFiles.WriteFile(problem, gaListener.getValue(), String.format("solutions/%s.res", problem.getName()));
+            MDVRPFiles.WriteFile(problem, gaListener.getValue().optimum, String.format("solutions/%s.res", problem.getName()));
         });
         gaListener.start();
 
