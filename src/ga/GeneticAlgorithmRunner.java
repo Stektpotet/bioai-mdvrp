@@ -11,6 +11,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class GeneticAlgorithmRunner<ProblemT, Pop extends Population<ProblemT, C>, C  extends Chromosome<ProblemT>> extends Service<GeneticAlgorithmSnapshot<C>> {
 
@@ -42,15 +43,14 @@ public class GeneticAlgorithmRunner<ProblemT, Pop extends Population<ProblemT, C
             @Override
             protected GeneticAlgorithmSnapshot<C> call() throws Exception {
                 Pop pop = initializer.breed(populationSize);
-                for (int i = 0; i < numGenerations; i++) {
+                var generationCounter = IntStream.iterate(0, i -> i + 1).iterator();
+                for (;true;) {
                     List<C> parents = parentSelector.select(pop);
                     List<C> offspring = mutator.mutateAll(pop, recombinator.recombine(parents));
                     pop = survivorSelector.select(pop, parents, offspring);
                     C optimum = pop.getOptimum();
-                    updateValue(new GeneticAlgorithmSnapshot<>(i, optimum));
-                    updateProgress(i, numGenerations);
+                    updateValue(new GeneticAlgorithmSnapshot<>(generationCounter.next(), optimum));
                 }
-                return new GeneticAlgorithmSnapshot<>(numGenerations, pop.getOptimum());
             }
         };
     }

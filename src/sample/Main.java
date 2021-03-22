@@ -1,11 +1,15 @@
 package sample;
 
 import ga.GeneticAlgorithmRunner;
+import ga.GeneticAlgorithmSnapshot;
+import ga.data.Chromosome;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import mdvrp.MDVRP;
@@ -19,28 +23,14 @@ public class Main extends Application {
 
     MDVRPVisualizer visualizer;
     MDVRP problem;
-    // BASED ON THIS
-    // https://jvm-gaming.org/t/looking-for-the-simplest-practical-javafx-game-loop/55903
-    private class UpdateLoop extends AnimationTimer {
 
-        private long before = System.nanoTime();
-
-        @Override
-        public void handle(long now) {
-            float delta = (float) ((now - before) / 1E9);
-            updateAndRender(delta);
-            before = now;
-        }
-    }
-        // TODO: Cleanup
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
     public void init() throws Exception {
-        if (!initializeProblem())
-            return;
+        problem = MDVRPFiles.ReadFile("res/problems/p10");
     }
 
     @Override
@@ -56,13 +46,12 @@ public class Main extends Application {
         visualizer.calibrateVisualizer(problem);
 
         Breeder breeder = new Breeder(problem, 10);
-        RecombinatorMDVRP recombinator = new RecombinatorMDVRP(problem, 0.6);
-        MutatorMDVRP mutator = new MutatorMDVRP(problem, 0.7f, 0.7f, 0.7f, 0.8f);
-        ParentSelectorMDVRP parentSelector = new ParentSelectorMDVRP(problem, 10,10, 0.8);
-        SurvivorSelectorMDVRP survivorSelector = new SurvivorSelectorMDVRP(problem);
-        MyPlusLambdaReplacement survivalSelector1 = new MyPlusLambdaReplacement(problem);
+        RecombinatorMDVRP recombinator = new RecombinatorMDVRP(problem, 1.0);
+        MutatorMDVRP mutator = new MutatorMDVRP(problem, 0.7f, 0.7f, 0.7f, 0.5f);
+        ParentSelectorMDVRP parentSelector = new ParentSelectorMDVRP(problem, 20,10, 0.8);
+        MyPlusLambdaReplacement survivalSelector = new MyPlusLambdaReplacement(problem);
         var gaListener = new GeneticAlgorithmRunner<>(
-                breeder, recombinator, mutator, parentSelector, survivalSelector1, 200, 20000
+                breeder, recombinator, mutator, parentSelector, survivalSelector, 400, 20000
         );
         gaListener.valueProperty().addListener((obs, prevSnapshot, newSnapshot) -> {
             if (newSnapshot != null) {
@@ -70,26 +59,17 @@ public class Main extends Application {
                 visualizer.drawAll(problem, newSnapshot);
             }
         });
-        gaListener.progressProperty().addListener((obs, oldProgress, newProgress) -> {
-        });
-        //TODO: On cancel write to file current optimum
-        gaListener.setOnSucceeded(event -> {
+        var start = System.currentTimeMillis();
+        primaryStage.setOnCloseRequest(event -> {
+            long diff = (System.currentTimeMillis()-start);
+
+            System.out.println(String.format("Ended after %02d:%02d", (diff / (1000 * 60)) % 60, (diff / 1000) % 60));
+            WritableImage snapshot = root.snapshot(null, null);
+            MDVRPFiles.WriteImg(snapshot, String.format("solutions/%s.png", problem.getName()));
             MDVRPFiles.WriteFile(problem, gaListener.getValue().optimum, String.format("solutions/%s.res", problem.getName()));
         });
+
         gaListener.start();
-
-//        new UpdateLoop().start();d
         primaryStage.show();
-    }
-
-    private boolean initializeProblem() {
-//        problem = ChromosomeMDVRP.;
-        problem = MDVRPFiles.ReadFile("res/problems/p11");
-        return true;
-    }
-
-    private void updateAndRender(float delta) {
-        // TODO: get fittest individual
-//        visualizer.drawAll(problem, schedule);
     }
 }
