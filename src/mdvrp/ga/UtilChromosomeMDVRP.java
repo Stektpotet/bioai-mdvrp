@@ -1,5 +1,6 @@
 package mdvrp.ga;
 
+import ga.data.Chromosome;
 import mdvrp.Customer;
 import mdvrp.Depot;
 import mdvrp.MDVRP;
@@ -11,6 +12,21 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UtilChromosomeMDVRP {
+
+    public static int hammingDistance(ChromosomeMDVRP a, ChromosomeMDVRP b) {
+        int dist = 0;
+        List<Integer> chromosomeA = new ArrayList<>();
+        List<Integer> chromosomeB = new ArrayList<>();
+
+        for (var depotID : a.getGenes().keySet()) {
+            chromosomeA.addAll(a.getGenes().get(depotID));
+            chromosomeB.addAll(b.getGenes().get(depotID));
+        }
+        for (int i = 0; i < chromosomeA.size(); i++) {
+            dist += (chromosomeA.get(i).equals(chromosomeB.get(i))) ? 0 : 1;
+        }
+        return dist;
+    }
 
     public static Comparator<ChromosomeMDVRP> chromosomeFitnessComparator(MDVRP problem) {
         return (a, b) -> (int) Math.signum(a.fitness(problem) - b.fitness(problem));

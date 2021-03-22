@@ -83,8 +83,9 @@ public class MDVRPVisualizer {
         graphics.setLineWidth(0.1);
 
         //TODO: Sensible positioning and scaling of text based on the problem bounds
+        graphics.strokeText(String.format("Gen #%4d", gen), bounds.getMinX(), bounds.getMaxY() - 9);
+        graphics.strokeText(chromosome.isFeasible(problem) ? "Feasible" : "Unfeasible", bounds.getMinX(), bounds.getMaxY() - 5);
         graphics.strokeText(String.format("Cost: %4.2f", chromosome.fitness(problem)), bounds.getMinX(), bounds.getMaxY() - 1);
-        graphics.strokeText(String.format("Gen #%4d", gen), bounds.getMinX(), bounds.getMaxY() - 5);
     }
 
     private BoundingBox calculateProblemBounds(MDVRP problem) {
@@ -139,17 +140,30 @@ public class MDVRPVisualizer {
             }
         }
     }
-
+    private void drawCustomersDemandColoring(Map<Integer, Customer> customers) {
+        double highestDemand = customers.values().stream().mapToInt(Customer::getDemand).max().orElse(1);
+        for (var customer : customers.values()) {
+            graphics.setFill(options.customerColor.interpolate(options.customerColorMaxDemand, customer.getDemand() / highestDemand));
+            graphics.fillOval(
+                    customer.getX() - options.customerSize * .5,
+                    customer.getY() - options.customerSize * .5,
+                    options.customerSize, options.customerSize);
+        }
+    }
+    public void drawProblemWithDemandColoring(MDVRP problem) {
+        drawCustomersDemandColoring(problem.getCustomers());
+        drawDepots(problem.getDepots());
+    }
     public void drawProblem(MDVRP problem) {
         drawCustomers(problem.getCustomers());
         drawDepots(problem.getDepots());
     }
     private void drawCustomers(Map<Integer, Customer> customers) {
         graphics.setFill(options.customerColor);
-        for (var depot : customers.values()) {
+        for (var customer : customers.values()) {
             graphics.fillOval(
-                    depot.getX() - options.customerSize * .5,
-                    depot.getY() - options.customerSize * .5,
+                    customer.getX() - options.customerSize * .5,
+                    customer.getY() - options.customerSize * .5,
                     options.customerSize, options.customerSize);
         }
     }

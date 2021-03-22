@@ -1,8 +1,11 @@
 package mdvrp;
 
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.WritableImage;
 import mdvrp.ga.ChromosomeMDVRP;
 import mdvrp.ga.UtilChromosomeMDVRP;
 
+import javax.imageio.ImageIO;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -60,6 +63,14 @@ public class MDVRPFiles {
         return null;
     }
 
+    public static void WriteImg(WritableImage snapshot, String filePath) {
+        File file = new File(filePath);
+        try {
+            ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", file);
+        }catch (IOException ignored) {
+
+        }
+    }
     public static void WriteFile(MDVRP problem, ChromosomeMDVRP chromosome, String fileName) {
         StringBuilder result = new StringBuilder(String.format("%.2f\n", chromosome.fitness(problem)));
         var solution = chromosome.getSolution(problem);
@@ -77,7 +88,7 @@ public class MDVRPFiles {
                 var routeStr = String.format("%d\t%d\t%4.2f\t%3d\t\t%s\n", depotNr, vehicleNr,
                         UtilChromosomeMDVRP.routeDuration(depot, route.streamCustomers(customers)),
                         UtilChromosomeMDVRP.routeDemand(route.streamCustomers(customers)),
-                        route.stream().map(String::valueOf).collect(Collectors.joining(" "))
+                        route.stream().map(String::valueOf).collect(Collectors.joining(" ", "0 ", " 0"))
                         );
                 result.append(routeStr);
                 vehicleNr++;
