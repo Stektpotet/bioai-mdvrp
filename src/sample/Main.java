@@ -30,7 +30,7 @@ public class Main extends Application {
 
     @Override
     public void init() throws Exception {
-        problem = MDVRPFiles.ReadFile("res/problems/p16");
+        problem = MDVRPFiles.ReadFile("res/problems/p04");
     }
 
     @Override
@@ -48,11 +48,12 @@ public class Main extends Application {
         Breeder breeder = new Breeder(problem, 10);
         RecombinatorMDVRP recombinator = new RecombinatorMDVRP(problem, 1.0);
         MutatorMDVRP mutator = new MutatorMDVRP(problem, 0.7f, 1.0f, 0.7f, 0.5f);
-        ParentSelectorMDVRP parentSelector = new ParentSelectorMDVRP(problem, 20,10, 0.8);
+        ParentSelectorMDVRP parentSelector = new ParentSelectorMDVRP(problem, 50,50, 0.8);
+        CrowdingSelector crowdingSelector = new CrowdingSelector(problem, 10);
         MyPlusLambdaReplacement survivorSelector = new MyPlusLambdaReplacement(problem);
 //        SurvivorSelectorMDVRP survivorSelector = new SurvivorSelectorMDVRP(problem);
         var gaListener = new GeneticAlgorithmRunner<>(
-                breeder, recombinator, mutator, parentSelector, survivorSelector, 400, 20000
+                breeder, recombinator, mutator, parentSelector, crowdingSelector, 1600, 20000
         );
         gaListener.valueProperty().addListener((obs, prevSnapshot, newSnapshot) -> {
             if (newSnapshot != null) {

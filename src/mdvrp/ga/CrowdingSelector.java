@@ -21,18 +21,18 @@ public class CrowdingSelector implements SurvivorSelector<MDVRP, PopulationMDVRP
         for (ChromosomeMDVRP child : offspring) {
 
             Comparator<ChromosomeMDVRP> differenceComparator =
-                    (a, b) -> UtilChromosomeMDVRP.hammingDistance(a, child) - UtilChromosomeMDVRP.hammingDistance(b, child);
+                    Comparator.comparingInt(a -> UtilChromosomeMDVRP.hammingDistance(a, child));
 
             List<ChromosomeMDVRP> individuals = generation.getIndividuals();
             List<ChromosomeMDVRP> comparisonPool = Util.randomChoice(individuals, crowdingFactor, false);
             ChromosomeMDVRP mostSimilarParent = Collections.min(comparisonPool, differenceComparator);
             
-            //if (mostSimilarParent.fitness(problem) > child.fitness(problem)) {
+            if (mostSimilarParent.fitness(problem) > child.fitness(problem)) {
                 individuals.remove(mostSimilarParent);
                 individuals.add(child);
-            //}
+            }
         }
 
-        return null;
+        return generation;
     }
 }
